@@ -1,9 +1,9 @@
 ﻿using System.Xml;
 
-XmlDocument xmlDoc = new();
-xmlDoc.Load("manifest.xml");
+XmlDocument xml = new();
+xml.Load("manifest.xml");
 
-XmlNodeList files = xmlDoc.GetElementsByTagName("file");
+XmlNodeList files = xml.GetElementsByTagName("file");
 
 string rootPath = Path.Combine(Environment.CurrentDirectory);
 

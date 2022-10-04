@@ -5,8 +5,8 @@ string[] files = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.zip", Se
 
 foreach (string file in files)
 {
-    ZipFile.ExtractToDirectory(file, Directory.GetParent(file).ToString(), true);
-    File.Delete(file);
+    await Task.Run(() => ZipFile.ExtractToDirectory(file, Directory.GetParent(file).ToString(), true));
+    await Task.Run(() => File.Delete(file));
 }
 
 XmlDocument xml = new();
@@ -25,17 +25,19 @@ string[] resources = Directory.GetDirectories(Directory.GetCurrentDirectory(), "
 
 foreach (string resource in resources)
 {
-    ZipFile.CreateFromDirectory(resource, $"{resource}.temp");
-    Directory.Delete(resource, true);
-    File.Move($"{resource}.temp", resource);
+    await Task.Run(() => ZipFile.CreateFromDirectory(resource, $"{resource}.temp"));
+    await Task.Run(() => Directory.Delete(resource, true));
+    await Task.Run(() => File.Move($"{resource}.temp", resource));
 }
 
 string[] temps = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.temp", SearchOption.AllDirectories);
 
 if (temps.Any())
-    Console.WriteLine(@"Orphaned Temp Resource Files Found; Remove The "".temp"" Extension Manually");
+{
+    Console.WriteLine(@"Orphaned Temp Resource Files Found; Rename The "".temp"" Extension To "".s2z"" Manually");
 
-foreach (string temp in temps)
-    Console.WriteLine($"Orphaned Temp Resource File: {temp}");
+    foreach (string temp in temps)
+        Console.WriteLine($"Orphaned Temp Resource File: {temp}");
+}
 
 Console.WriteLine($"{resources.Length} Resource Files Processed");

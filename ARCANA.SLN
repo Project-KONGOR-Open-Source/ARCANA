@@ -5,7 +5,9 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckArchiveFileSize", "CheckArchiveFileSize\CheckArchiveFileSize.CSPROJ", "{C9C726C2-47BF-411A-BE0F-204AF578FD07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnpackArchiveFiles", "UnpackArchiveFiles\UnpackArchiveFiles.CSPROJ", "{A6AC53FD-6AF5-4ED7-A778-52FBB2365240}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnpackArchiveFiles", "UnpackArchiveFiles\UnpackArchiveFiles.CSPROJ", "{A6AC53FD-6AF5-4ED7-A778-52FBB2365240}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwingTheBanHammer", "SwingTheBanHammer\SwingTheBanHammer.csproj", "{4B0D9869-16B3-48D9-9ADE-A1F9F69E9992}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A6AC53FD-6AF5-4ED7-A778-52FBB2365240}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6AC53FD-6AF5-4ED7-A778-52FBB2365240}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6AC53FD-6AF5-4ED7-A778-52FBB2365240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B0D9869-16B3-48D9-9ADE-A1F9F69E9992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B0D9869-16B3-48D9-9ADE-A1F9F69E9992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B0D9869-16B3-48D9-9ADE-A1F9F69E9992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B0D9869-16B3-48D9-9ADE-A1F9F69E9992}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

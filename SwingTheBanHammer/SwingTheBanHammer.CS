@@ -35,10 +35,10 @@ Console.WriteLine();
 
 HttpClient client = new()
 {
-    BaseAddress = new Uri("http://localhost:666") // new Uri("kongor.online");
+    BaseAddress = new Uri("https://api.kongor.online/")
 };
 
-HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/identities/login", new Dictionary<string, string> { { "name", username }, { "password", password } });
+HttpResponseMessage loginResponse = await client.PostAsJsonAsync("identities/login", new Dictionary<string, string> { { "name", username }, { "password", password } });
 
 Console.WriteLine();
 

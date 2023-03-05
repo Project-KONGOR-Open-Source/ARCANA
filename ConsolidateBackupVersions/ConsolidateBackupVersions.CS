@@ -1,4 +1,4 @@
-﻿string[] directories = Directory.GetDirectories(Directory.GetCurrentDirectory()).OrderDescending().ToArray();
+﻿string[] directories = Directory.GetDirectories(Directory.GetCurrentDirectory()).OrderByDescending(path => new Version(new DirectoryInfo(path).Name)).ToArray();
 
 for (int i = 0; i < directories.Length - 1; i++)
 {

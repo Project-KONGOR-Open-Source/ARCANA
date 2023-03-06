@@ -1,22 +1,39 @@
 ﻿string[] directories = Directory.GetDirectories(Directory.GetCurrentDirectory()).OrderByDescending(path => new Version(new DirectoryInfo(path).Name)).ToArray();
 
+string first = directories.Last();
+string latest = directories.First();
+
 for (int i = 0; i < directories.Length - 1; i++)
 {
-    string[] files = Directory.GetFiles(directories[i]);
-
-    foreach (string file in files)
-        File.Copy(file, Path.Combine(directories[i + 1], Path.GetFileName(file)), true);
+    string[] files = Directory.GetFiles(directories[i], "*.*", SearchOption.AllDirectories);
 
     string currentVersion = new DirectoryInfo(directories[i]).Name;
     string previousVersion = new DirectoryInfo(directories[i + 1]).Name;
 
-    Console.WriteLine($@"{files.Length} Files From Version ""{currentVersion}"" Applied On Top Of Version ""{previousVersion}""");
+    foreach (string file in files)
+    {
+        string destinationFile = file.Replace(currentVersion, previousVersion);
 
-    Directory.Delete(directories[i], true);
+        string destinationDirectory = Path.GetDirectoryName(destinationFile);
+
+        if (Directory.Exists(destinationDirectory) is false)
+            Directory.CreateDirectory(destinationDirectory);
+
+        File.Move(file, destinationFile, true);
+    }
+
+    string[] leftovers = Directory.GetFiles(directories[i], "*.*", SearchOption.AllDirectories);
+
+    if (leftovers.Any())
+        Console.WriteLine($@"[ERROR] {leftovers.Length} Leftover Files In Version ""{currentVersion}""");
+
+    else
+    {
+        Directory.Delete(directories[i], true);
+
+        Console.WriteLine($@"{files.Length} Files From Version ""{currentVersion}"" Applied On Top Of Version ""{previousVersion}""");
+    }
 }
-
-string first = directories.Last();
-string latest = directories.First();
 
 Directory.Move(first, latest);
 

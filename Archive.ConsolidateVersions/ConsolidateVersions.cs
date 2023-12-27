@@ -14,7 +14,7 @@ for (int i = 0; i < directories.Length - 1; i++)
     {
         string destinationFile = file.Replace(currentVersion, previousVersion);
 
-        string destinationDirectory = Path.GetDirectoryName(destinationFile);
+        string destinationDirectory = Path.GetDirectoryName(destinationFile) ?? throw new NullReferenceException($@"Directory Name For File ""{destinationFile}"" Is NULL");
 
         if (Directory.Exists(destinationDirectory) is false)
             Directory.CreateDirectory(destinationDirectory);

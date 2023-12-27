@@ -5,14 +5,14 @@ string[] files = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.zip", Se
 
 foreach (string file in files)
 {
-    await Task.Run(() => ZipFile.ExtractToDirectory(file, Directory.GetParent(file).ToString(), true));
+    await Task.Run(() => ZipFile.ExtractToDirectory(file, Directory.GetParent(file)?.ToString() ?? throw new NullReferenceException($@"The Parent Of File ""{file}"" Is NULL"), true));
     await Task.Run(() => File.Delete(file));
 }
 
 XmlDocument xml = new();
 xml.Load("manifest.xml");
 
-string version = xml.DocumentElement.GetAttribute("version");
+string version = xml.DocumentElement!.GetAttribute("version");
 
 using (ZipArchive archive = ZipFile.Open($"{version}.manifest.xml.zip", ZipArchiveMode.Create))
     archive.CreateEntryFromFile("manifest.xml", "manifest.xml");

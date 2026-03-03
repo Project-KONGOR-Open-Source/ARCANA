@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.IO.Compression;
+using System.Xml;
 
 namespace Distribution.CheckFileSizes;
 
@@ -8,30 +9,41 @@ internal class CheckFileSizes
     {
         string parentDirectory = args.Length is 1 ? args.Single() : Environment.CurrentDirectory;
 
-        XmlDocument xml = new();
+        string manifestZipFile = Path.Combine(parentDirectory, "manifest.xml.zip");
+        string manifestFile = Path.Combine(parentDirectory, "manifest.xml");
 
-        xml.Load(Path.Combine(parentDirectory, "manifest.xml"));
+        ZipFile.ExtractToDirectory(manifestZipFile, parentDirectory, true);
 
-        XmlNodeList files = xml.GetElementsByTagName("file");
-
-        string rootPath = Path.Combine(parentDirectory);
-
-        for (int i = 0; i < files.Count; i++)
+        try
         {
-            XmlNode file = files[i] ?? throw new NullReferenceException($"File Index {i} Is NULL");
+            XmlDocument xml = new();
 
-            string filePath = Path.Combine(rootPath, file.Attributes!["path"]!.Value + ".zip");
+            xml.Load(manifestFile);
 
-            long manifestZipSize = long.Parse(file.Attributes!["zipsize"]!.Value);
-            long fileZipSize = new FileInfo(filePath).Length;
+            XmlNodeList files = xml.GetElementsByTagName("file");
 
-            if (fileZipSize.Equals(manifestZipSize).Equals(false))
+            for (int i = 0; i < files.Count; i++)
             {
-                Console.WriteLine($"File Path: {filePath}");
-                Console.WriteLine($"Manifest Zip Size {manifestZipSize} Does Not Match File Zip Size {fileZipSize}");
+                XmlNode file = files[i] ?? throw new NullReferenceException($"File Index {i} Is NULL");
+
+                string filePath = Path.Combine(parentDirectory, file.Attributes!["path"]!.Value + ".zip");
+
+                long manifestZipSize = long.Parse(file.Attributes!["zipsize"]!.Value);
+                long fileZipSize = new FileInfo(filePath).Length;
+
+                if (fileZipSize.Equals(manifestZipSize).Equals(false))
+                {
+                    Console.WriteLine($"File Path: {filePath}");
+                    Console.WriteLine($"Manifest Zip Size {manifestZipSize} Does Not Match File Zip Size {fileZipSize}");
+                }
             }
+
+            Console.WriteLine($"{files.Count} Files Processed");
         }
 
-        Console.WriteLine($"{files.Count} Files Processed");
+        finally
+        {
+            File.Delete(manifestFile);
+        }
     }
 }

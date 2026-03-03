@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Xml;
 
 namespace Distribution.UnpackFiles;
 
@@ -20,16 +19,6 @@ internal class UnpackFiles
             ZipFile.ExtractToDirectory(file, fileParentDirectory, true);
             File.Delete(file);
         }
-
-        XmlDocument xml = new();
-        xml.Load(Path.Combine(parentDirectory, "manifest.xml"));
-
-        string version = xml.DocumentElement!.GetAttribute("version");
-
-        using (ZipArchive archive = ZipFile.Open(Path.Combine(parentDirectory, $"{version}.manifest.xml.zip"), ZipArchiveMode.Create))
-            archive.CreateEntryFromFile(Path.Combine(parentDirectory, "manifest.xml"), "manifest.xml");
-
-        File.Delete(Path.Combine(parentDirectory, "manifest.xml"));
 
         Console.WriteLine($"{files.Length} ZIP Files Processed");
 

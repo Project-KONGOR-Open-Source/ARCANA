@@ -6,12 +6,13 @@ internal class CheckFileSizes
 {
     internal static void Main(string[] args)
     {
+        string parentDirectory = args.Length is 1 ? args.Single() : Environment.CurrentDirectory;
+
         XmlDocument xml = new();
-        xml.Load("manifest.xml");
+
+        xml.Load(Path.Combine(parentDirectory, "manifest.xml"));
 
         XmlNodeList files = xml.GetElementsByTagName("file");
-
-        string parentDirectory = args.Length is 1 ? args.Single() : Environment.CurrentDirectory;
 
         string rootPath = Path.Combine(parentDirectory);
 

@@ -13,7 +13,7 @@ internal class UnpackFiles
 
         foreach (string file in files)
         {
-            string fileParentDirectory = Directory.GetParent(file)?.ToString() ?? throw new InvalidOperationException($@"The Parent Of File ""{file}"" Is NULL");
+            string fileParentDirectory = Directory.GetParent(file)?.ToString() ?? throw new NullReferenceException($@"The Parent Of File ""{file}"" Is NULL");
 
             ZipFile.ExtractToDirectory(file, fileParentDirectory, true);
             File.Delete(file);

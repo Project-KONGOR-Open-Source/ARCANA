@@ -5,7 +5,7 @@ namespace Distribution.UnpackFiles;
 
 internal class UnpackFiles
 {
-    internal static async Task Main(string[] args)
+    internal static void Main(string[] args)
     {
         string parentDirectory = args.Length is 1 ? args.Single() : Environment.CurrentDirectory;
 
@@ -13,8 +13,10 @@ internal class UnpackFiles
 
         foreach (string file in files)
         {
-            await Task.Run(() => ZipFile.ExtractToDirectory(file, Directory.GetParent(file)?.ToString() ?? throw new NullReferenceException($@"The Parent Of File ""{file}"" Is NULL"), true));
-            await Task.Run(() => File.Delete(file));
+            string fileParentDirectory = Directory.GetParent(file)?.ToString() ?? throw new InvalidOperationException($@"The Parent Of File ""{file}"" Is NULL");
+
+            ZipFile.ExtractToDirectory(file, fileParentDirectory, true);
+            File.Delete(file);
         }
 
         XmlDocument xml = new();
@@ -33,9 +35,9 @@ internal class UnpackFiles
 
         foreach (string resource in resources)
         {
-            await Task.Run(() => ZipFile.CreateFromDirectory(resource, $"{resource}.temp"));
-            await Task.Run(() => Directory.Delete(resource, true));
-            await Task.Run(() => File.Move($"{resource}.temp", resource));
+            ZipFile.CreateFromDirectory(resource, $"{resource}.temp");
+            Directory.Delete(resource, true);
+            File.Move($"{resource}.temp", resource);
         }
 
         string[] temps = Directory.GetFiles(parentDirectory, "*.temp", SearchOption.AllDirectories);

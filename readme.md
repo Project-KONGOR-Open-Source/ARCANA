@@ -12,7 +12,7 @@
 
 - Distribution
     - **CheckFileSizes** : Used to assert the integrity of a distribution's CDN backup. This tool checks the respective size of each ZIP file included in the distribution, following the tree structure defined by the distribution's manifest.
-    - **UnpackFiles** : Used to create a clean distribution. This tool unpacks each ZIP file included in the distribution, following the tree structure defined by the distribution's manifest. Once a file has been unpacked, the original ZIP file is deleted. Lastly, unpacked resource files will be bundled together into S2Z files.
+    - **UnpackFiles** : Used to create a clean distribution. This tool unpacks each ZIP file included in the distribution, following the tree structure defined by the distribution's manifest. Once a file has been unpacked, the original ZIP file is deleted. Optionally, unpacked resource files can be bundled together into S2Z files.
 
 <br/>
 
@@ -29,5 +29,5 @@
 The workflow for the tools above is the following:
   1. produce a CDN backup by either downloading the individual files from the CDN (no longer possible) or by consolidating the versions of a distribution archive (if you have one laying around)
   2. check the file sizes against the manifest to confirm the distribution's integrity
-  3. unpack the distribution's files and create the S2Z resource bundles
+  3. unpack the distribution's files and, optionally, create the S2Z resource bundles
   4. we should now have a clean client or server distribution, ready to be run

@@ -3,6 +3,18 @@ using System.Xml;
 
 namespace Distribution.CheckFileSizes;
 
+/// <summary>
+///     Checks the file sizes of the zip files in the manifest against the actual zip files in the directory.
+///     If the file sizes do not match, it will print the file path and the expected and actual file sizes.
+///     This is useful for verifying that the files in the manifest are correct and have not been corrupted during the distribution process.
+/// </summary>
+/// <remarks>
+///     Example Usage:
+///
+///     <code>
+///         ./Distribution.CheckFileSizes.exe "path/to/directory"
+///     </code>
+/// </remarks>
 internal class CheckFileSizes
 {
     internal static void Main(string[] args)

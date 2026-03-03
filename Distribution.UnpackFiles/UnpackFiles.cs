@@ -2,6 +2,18 @@
 
 namespace Distribution.UnpackFiles;
 
+/// <summary>
+///     Unpacks the zip files in the directory and deletes the zip files after unpacking. 
+///     If the "bundleResourceFiles" flag is set to true, it will also bundle resource files into individual zip files.
+///     This is useful for preparing the files for distribution to end users.
+/// </summary>
+/// <remarks>
+///     Example Usage:
+///
+///     <code>
+///         ./Distribution.UnpackFiles.exe "path/to/directory" false
+///     </code>
+/// </remarks>
 internal class UnpackFiles
 {
     internal static void Main(string[] args)

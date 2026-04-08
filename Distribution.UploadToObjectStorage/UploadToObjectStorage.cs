@@ -16,7 +16,7 @@ namespace Distribution.UploadToObjectStorage;
 ///     </code>
 ///
 ///     Optional 6th argument: maximum retry attempts per file (default: 5).
-///     Optional 7th argument: key prefix to prepend to all uploaded object keys.
+///     Optional 7th argument: key prefix to prepend to all uploaded object keys (e.g. "wac/4.10.1", to organize files under a subdirectory in the bucket).
 /// </remarks>
 internal class UploadToObjectStorage
 {

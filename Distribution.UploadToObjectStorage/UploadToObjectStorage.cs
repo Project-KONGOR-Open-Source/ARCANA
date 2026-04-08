@@ -111,9 +111,9 @@ internal class UploadToObjectStorage
                 return true;
             }
 
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Console.WriteLine($@"[Attempt {attempt}/{maxRetries}] Upload Failed For ""{key}"": {ex.Message}");
+                Console.WriteLine($@"[Attempt {attempt}/{maxRetries}] Upload Failed For ""{key}"": {exception.Message}");
 
                 if (attempt < maxRetries)
                 {

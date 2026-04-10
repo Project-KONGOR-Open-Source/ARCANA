@@ -4,5 +4,7 @@
     <Project Path="Distribution.CheckFileSizes/Distribution.CheckFileSizes.csproj" />
     <Project Path="Distribution.DeleteFromObjectStorage/Distribution.DeleteFromObjectStorage.csproj" />
     <Project Path="Distribution.DownloadFromObjectStorage/Distribution.DownloadFromObjectStorage.csproj" />
+    <Project Path="Distribution.PackResourceFiles/Distribution.PackResourceFiles.csproj" />
+    <Project Path="Distribution.UnpackResourceFiles/Distribution.UnpackResourceFiles.csproj" />
     <Project Path="Distribution.UploadToObjectStorage/Distribution.UploadToObjectStorage.csproj" />
 </Solution>

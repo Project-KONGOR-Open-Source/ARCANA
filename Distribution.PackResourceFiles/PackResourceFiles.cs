@@ -17,13 +17,13 @@ namespace Distribution.PackResourceFiles;
 /// </remarks>
 internal class PackResourceFiles
 {
-    private const int DefaultMaxRetries = 5;
+    private const int DefaultMaximumRetries = 5;
     private static readonly TimeSpan InitialRetryDelay = TimeSpan.FromSeconds(1);
 
-    internal static int Main(string[] args)
+    internal static int Main(string[] arguments)
     {
-        string parentDirectory = args.Length >= 1 ? args[0] : Environment.CurrentDirectory;
-        int maxRetries = args.Length >= 2 ? int.Parse(args[1]) : DefaultMaxRetries;
+        string parentDirectory = arguments.Length >= 1 ? arguments[0] : Environment.CurrentDirectory;
+        int maximumRetries = arguments.Length >= 2 ? int.Parse(arguments[1]) : DefaultMaximumRetries;
 
         string[] resourceDirectories = Directory.GetDirectories(parentDirectory, "*.s2z", SearchOption.AllDirectories);
 
@@ -40,24 +40,24 @@ internal class PackResourceFiles
         foreach (string resourceDirectory in resourceDirectories)
         {
             string archivePath = resourceDirectory;
-            string tempArchivePath = $"{resourceDirectory}.tmp";
+            string temporaryArchivePath = $"{resourceDirectory}.tmp";
 
             Console.WriteLine($@"Packing ""{resourceDirectory}"" → ""{archivePath}""");
 
-            if (PackWithRetry(resourceDirectory, tempArchivePath, maxRetries))
+            if (PackWithRetry(resourceDirectory, temporaryArchivePath, maximumRetries))
             {
-                if (DeleteDirectoryWithRetry(resourceDirectory, maxRetries))
+                if (DeleteDirectoryWithRetry(resourceDirectory, maximumRetries))
                 {
-                    MoveFileWithRetry(tempArchivePath, archivePath, maxRetries);
+                    MoveFileWithRetry(temporaryArchivePath, archivePath, maximumRetries);
 
                     succeeded++;
                 }
 
                 else
                 {
-                    Console.WriteLine($@"Failed To Delete Directory ""{resourceDirectory}"" After {maxRetries} Attempts; Cleaning Up Temp Archive");
+                    Console.WriteLine($@"Failed To Delete Directory ""{resourceDirectory}"" After {maximumRetries} Attempts; Cleaning Up Temp Archive");
 
-                    DeleteFileWithRetry(tempArchivePath, maxRetries);
+                    DeleteFileWithRetry(temporaryArchivePath, maximumRetries);
 
                     failed++;
                 }
@@ -65,9 +65,9 @@ internal class PackResourceFiles
 
             else
             {
-                Console.WriteLine($@"Failed To Pack ""{resourceDirectory}"" After {maxRetries} Attempts");
+                Console.WriteLine($@"Failed To Pack ""{resourceDirectory}"" After {maximumRetries} Attempts");
 
-                DeleteFileWithRetry(tempArchivePath, maxRetries);
+                DeleteFileWithRetry(temporaryArchivePath, maximumRetries);
 
                 failed++;
             }
@@ -81,27 +81,27 @@ internal class PackResourceFiles
     /// <summary>
     ///     Creates a ZIP archive from a directory with retry and exponential backoff.
     /// </summary>
-    private static bool PackWithRetry(string sourceDirectory, string tempArchivePath, int maxRetries)
+    private static bool PackWithRetry(string sourceDirectory, string temporaryArchivePath, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
-                if (File.Exists(tempArchivePath))
-                    File.Delete(tempArchivePath);
+                if (File.Exists(temporaryArchivePath))
+                    File.Delete(temporaryArchivePath);
 
-                ZipFile.CreateFromDirectory(sourceDirectory, tempArchivePath);
+                ZipFile.CreateFromDirectory(sourceDirectory, temporaryArchivePath);
 
                 return true;
             }
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"Attempt {attempt}/{maxRetries} Failed For ""{sourceDirectory}"": {exception.Message}");
+                Console.WriteLine($@"Attempt {attempt}/{maximumRetries} Failed For ""{sourceDirectory}"": {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                     Thread.Sleep(delay);
 
                 delay = InitialRetryDelay * (1 << attempt);
@@ -114,11 +114,11 @@ internal class PackResourceFiles
     /// <summary>
     ///     Deletes a directory recursively with retry and exponential backoff.
     /// </summary>
-    private static bool DeleteDirectoryWithRetry(string directoryPath, int maxRetries)
+    private static bool DeleteDirectoryWithRetry(string directoryPath, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -129,9 +129,9 @@ internal class PackResourceFiles
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"Attempt {attempt}/{maxRetries} To Delete ""{directoryPath}"" Failed: {exception.Message}");
+                Console.WriteLine($@"Attempt {attempt}/{maximumRetries} To Delete ""{directoryPath}"" Failed: {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                     Thread.Sleep(delay);
 
                 delay = InitialRetryDelay * (1 << attempt);
@@ -144,11 +144,11 @@ internal class PackResourceFiles
     /// <summary>
     ///     Moves a file with retry and exponential backoff.
     /// </summary>
-    private static void MoveFileWithRetry(string sourcePath, string destinationPath, int maxRetries)
+    private static void MoveFileWithRetry(string sourcePath, string destinationPath, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -159,26 +159,26 @@ internal class PackResourceFiles
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"Attempt {attempt}/{maxRetries} To Move ""{sourcePath}"" → ""{destinationPath}"" Failed: {exception.Message}");
+                Console.WriteLine($@"Attempt {attempt}/{maximumRetries} To Move ""{sourcePath}"" → ""{destinationPath}"" Failed: {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                     Thread.Sleep(delay);
 
                 delay = InitialRetryDelay * (1 << attempt);
             }
         }
 
-        Console.WriteLine($@"Failed To Move ""{sourcePath}"" → ""{destinationPath}"" After {maxRetries} Attempts");
+        Console.WriteLine($@"Failed To Move ""{sourcePath}"" → ""{destinationPath}"" After {maximumRetries} Attempts");
     }
 
     /// <summary>
     ///     Deletes a file with retry and exponential backoff to handle transient file locks.
     /// </summary>
-    private static void DeleteFileWithRetry(string filePath, int maxRetries)
+    private static void DeleteFileWithRetry(string filePath, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -190,15 +190,15 @@ internal class PackResourceFiles
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"Attempt {attempt}/{maxRetries} To Delete ""{filePath}"" Failed: {exception.Message}");
+                Console.WriteLine($@"Attempt {attempt}/{maximumRetries} To Delete ""{filePath}"" Failed: {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                     Thread.Sleep(delay);
 
                 delay = InitialRetryDelay * (1 << attempt);
             }
         }
 
-        Console.WriteLine($@"Failed To Delete ""{filePath}"" After {maxRetries} Attempts");
+        Console.WriteLine($@"Failed To Delete ""{filePath}"" After {maximumRetries} Attempts");
     }
 }

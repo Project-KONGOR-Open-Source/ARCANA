@@ -17,9 +17,9 @@ namespace Distribution.CheckFileSizes;
 /// </remarks>
 internal class CheckFileSizes
 {
-    internal static void Main(string[] args)
+    internal static void Main(string[] arguments)
     {
-        string parentDirectory = args.Length is 1 ? args.Single() : Environment.CurrentDirectory;
+        string parentDirectory = arguments.Length is 1 ? arguments.Single() : Environment.CurrentDirectory;
 
         string manifestZipFile = Path.Combine(parentDirectory, "manifest.xml.zip");
         string manifestFile = Path.Combine(parentDirectory, "manifest.xml");
@@ -28,15 +28,15 @@ internal class CheckFileSizes
 
         try
         {
-            XmlDocument xml = new();
+            XmlDocument xmlDocument = new();
 
-            xml.Load(manifestFile);
+            xmlDocument.Load(manifestFile);
 
-            XmlNodeList files = xml.GetElementsByTagName("file");
+            XmlNodeList files = xmlDocument.GetElementsByTagName("file");
 
-            for (int i = 0; i < files.Count; i++)
+            for (int index = 0; index < files.Count; index++)
             {
-                XmlNode file = files[i] ?? throw new NullReferenceException($"File Index {i} Is NULL");
+                XmlNode file = files[index] ?? throw new NullReferenceException($"File Index {index} Is NULL");
 
                 string filePath = Path.Combine(parentDirectory, file.Attributes!["path"]!.Value + ".zip");
 

@@ -14,9 +14,9 @@
 /// </remarks>
 internal class ConsolidateVersions
 {
-    internal static void Main(string[] args)
+    internal static void Main(string[] arguments)
     {
-        string parentDirectory = args.Length is 1 ? args.Single() : Environment.CurrentDirectory;
+        string parentDirectory = arguments.Length is 1 ? arguments.Single() : Environment.CurrentDirectory;
 
         string[] directories = Directory.GetDirectories(parentDirectory).OrderByDescending(path => new Version(new DirectoryInfo(path).Name)).ToArray();
 

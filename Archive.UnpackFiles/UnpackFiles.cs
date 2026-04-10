@@ -16,11 +16,11 @@ namespace Archive.UnpackFiles;
 /// </remarks>
 internal class UnpackFiles
 {
-    internal static void Main(string[] args)
+    internal static void Main(string[] arguments)
     {
-        string parentDirectory = args.Length is 1 ? args.Single() : args.Length is 2 ? args.First() : Environment.CurrentDirectory;
+        string parentDirectory = arguments.Length is 1 ? arguments.Single() : arguments.Length is 2 ? arguments.First() : Environment.CurrentDirectory;
 
-        bool bundleResourceFiles = args.Length is 2 ? bool.Parse(args.Last()) : false;
+        bool bundleResourceFiles = arguments.Length is 2 ? bool.Parse(arguments.Last()) : false;
 
         string[] files = Directory.GetFiles(parentDirectory, "*.zip", SearchOption.AllDirectories);
 
@@ -45,14 +45,14 @@ internal class UnpackFiles
                 File.Move($"{resource}.temp", resource);
             }
 
-            string[] temps = Directory.GetFiles(parentDirectory, "*.temp", SearchOption.AllDirectories);
+            string[] temporaryFiles = Directory.GetFiles(parentDirectory, "*.temp", SearchOption.AllDirectories);
 
-            if (temps.Any())
+            if (temporaryFiles.Any())
             {
                 Console.WriteLine(@"Orphaned Temp Resource Files Found; Rename The "".temp"" Extension To "".s2z"" Manually");
 
-                foreach (string temp in temps)
-                    Console.WriteLine($"Orphaned Temp Resource File: {temp}");
+                foreach (string temporaryFile in temporaryFiles)
+                    Console.WriteLine($"Orphaned Temp Resource File: {temporaryFile}");
             }
         }
 

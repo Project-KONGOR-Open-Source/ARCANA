@@ -19,25 +19,25 @@ namespace Distribution.DeleteFromObjectStorage;
 /// </remarks>
 internal class DeleteFromObjectStorage
 {
-    private const int DefaultMaxRetries = 5;
+    private const int DefaultMaximumRetries = 5;
     private const int ListBatchSize = 1000;
     private static readonly TimeSpan InitialRetryDelay = TimeSpan.FromSeconds(1);
 
-    internal static async Task<int> Main(string[] args)
+    internal static async Task<int> Main(string[] arguments)
     {
-        if (args.Length < 5)
+        if (arguments.Length < 5)
         {
             Console.WriteLine("USAGE: Distribution.DeleteFromObjectStorage <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries]");
 
             return 1;
         }
 
-        string bucket = args[0];
-        string serviceUrl = args[1];
-        string accessKey = args[2];
-        string secretKey = args[3];
-        string keyPrefix = args[4];
-        int maxRetries = args.Length >= 6 ? int.Parse(args[5]) : DefaultMaxRetries;
+        string bucket = arguments[0];
+        string serviceUrl = arguments[1];
+        string accessKey = arguments[2];
+        string secretKey = arguments[3];
+        string keyPrefix = arguments[4];
+        int maximumRetries = arguments.Length >= 6 ? int.Parse(arguments[5]) : DefaultMaximumRetries;
 
         BasicAWSCredentials credentials = new(accessKey, secretKey);
 
@@ -85,7 +85,7 @@ internal class DeleteFromObjectStorage
 
         foreach (string key in keys)
         {
-            bool success = await DeleteObjectWithRetry(client, bucket, key, maxRetries);
+            bool success = await DeleteObjectWithRetry(client, bucket, key, maximumRetries);
 
             if (success) deleted++; else failed++;
 
@@ -101,11 +101,11 @@ internal class DeleteFromObjectStorage
         return failed > 0 ? 1 : 0;
     }
 
-    private static async Task<bool> DeleteObjectWithRetry(IAmazonS3 client, string bucket, string key, int maxRetries)
+    private static async Task<bool> DeleteObjectWithRetry(IAmazonS3 client, string bucket, string key, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -122,9 +122,9 @@ internal class DeleteFromObjectStorage
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"[Attempt {attempt}/{maxRetries}] Deletion Failed For ""{key}"": {exception.Message}");
+                Console.WriteLine($@"[Attempt {attempt}/{maximumRetries}] Deletion Failed For ""{key}"": {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                 {
                     Console.WriteLine($"Retrying In {delay.TotalSeconds:F0}s ...");
 

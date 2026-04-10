@@ -19,26 +19,26 @@ namespace Distribution.DownloadFromObjectStorage;
 /// </remarks>
 internal class DownloadFromObjectStorage
 {
-    private const int DefaultMaxRetries = 5;
+    private const int DefaultMaximumRetries = 5;
     private const int ListBatchSize = 1000;
     private static readonly TimeSpan InitialRetryDelay = TimeSpan.FromSeconds(1);
 
-    internal static async Task<int> Main(string[] args)
+    internal static async Task<int> Main(string[] arguments)
     {
-        if (args.Length < 6)
+        if (arguments.Length < 6)
         {
             Console.WriteLine("USAGE: Distribution.DownloadFromObjectStorage <directory> <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries]");
 
             return 1;
         }
 
-        string directory = args[0];
-        string bucket = args[1];
-        string serviceUrl = args[2];
-        string accessKey = args[3];
-        string secretKey = args[4];
-        string keyPrefix = args[5];
-        int maxRetries = args.Length >= 7 ? int.Parse(args[6]) : DefaultMaxRetries;
+        string directory = arguments[0];
+        string bucket = arguments[1];
+        string serviceUrl = arguments[2];
+        string accessKey = arguments[3];
+        string secretKey = arguments[4];
+        string keyPrefix = arguments[5];
+        int maximumRetries = arguments.Length >= 7 ? int.Parse(arguments[6]) : DefaultMaximumRetries;
 
         Directory.CreateDirectory(directory);
 
@@ -91,7 +91,7 @@ internal class DownloadFromObjectStorage
             string relativePath = key.StartsWith(keyPrefix) ? key[keyPrefix.Length..].TrimStart('/') : key;
             string localPath = Path.Combine(directory, relativePath.Replace('/', Path.DirectorySeparatorChar));
 
-            bool success = await DownloadFileWithRetry(client, bucket, key, localPath, maxRetries);
+            bool success = await DownloadFileWithRetry(client, bucket, key, localPath, maximumRetries);
 
             if (success) downloaded++; else failed++;
 
@@ -107,11 +107,11 @@ internal class DownloadFromObjectStorage
         return failed > 0 ? 1 : 0;
     }
 
-    private static async Task<bool> DownloadFileWithRetry(IAmazonS3 client, string bucket, string key, string localPath, int maxRetries)
+    private static async Task<bool> DownloadFileWithRetry(IAmazonS3 client, string bucket, string key, string localPath, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -137,9 +137,9 @@ internal class DownloadFromObjectStorage
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"[Attempt {attempt}/{maxRetries}] Download Failed For ""{key}"": {exception.Message}");
+                Console.WriteLine($@"[Attempt {attempt}/{maximumRetries}] Download Failed For ""{key}"": {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                 {
                     Console.WriteLine($"Retrying In {delay.TotalSeconds:F0}s ...");
 

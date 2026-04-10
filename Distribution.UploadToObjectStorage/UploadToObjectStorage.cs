@@ -20,25 +20,25 @@ namespace Distribution.UploadToObjectStorage;
 /// </remarks>
 internal class UploadToObjectStorage
 {
-    private const int DefaultMaxRetries = 5;
+    private const int DefaultMaximumRetries = 5;
     private static readonly TimeSpan InitialRetryDelay = TimeSpan.FromSeconds(1);
 
-    internal static async Task<int> Main(string[] args)
+    internal static async Task<int> Main(string[] arguments)
     {
-        if (args.Length < 5)
+        if (arguments.Length < 5)
         {
             Console.WriteLine("USAGE: Distribution.UploadToObjectStorage <directory> <bucket> <serviceUrl> <accessKey> <secretKey> [maxRetries] [keyPrefix]");
 
             return 1;
         }
 
-        string directory = args[0];
-        string bucket = args[1];
-        string serviceUrl = args[2];
-        string accessKey = args[3];
-        string secretKey = args[4];
-        int maxRetries = args.Length >= 6 ? int.Parse(args[5]) : DefaultMaxRetries;
-        string keyPrefix = args.Length >= 7 ? args[6] : string.Empty;
+        string directory = arguments[0];
+        string bucket = arguments[1];
+        string serviceUrl = arguments[2];
+        string accessKey = arguments[3];
+        string secretKey = arguments[4];
+        int maximumRetries = arguments.Length >= 6 ? int.Parse(arguments[5]) : DefaultMaximumRetries;
+        string keyPrefix = arguments.Length >= 7 ? arguments[6] : string.Empty;
 
         if (Directory.Exists(directory) is false)
         {
@@ -73,7 +73,7 @@ internal class UploadToObjectStorage
             string relativePath = Path.GetRelativePath(directory, file).Replace('\\', '/');
             string key = string.IsNullOrEmpty(keyPrefix) ? relativePath : $"{keyPrefix.TrimEnd('/')}/{relativePath}";
 
-            bool success = await UploadFileWithRetry(client, bucket, key, file, maxRetries);
+            bool success = await UploadFileWithRetry(client, bucket, key, file, maximumRetries);
 
             if (success) uploaded++; else failed++;
 
@@ -89,11 +89,11 @@ internal class UploadToObjectStorage
         return failed > 0 ? 1 : 0;
     }
 
-    private static async Task<bool> UploadFileWithRetry(IAmazonS3 client, string bucket, string key, string filePath, int maxRetries)
+    private static async Task<bool> UploadFileWithRetry(IAmazonS3 client, string bucket, string key, string filePath, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -113,9 +113,9 @@ internal class UploadToObjectStorage
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"[Attempt {attempt}/{maxRetries}] Upload Failed For ""{key}"": {exception.Message}");
+                Console.WriteLine($@"[Attempt {attempt}/{maximumRetries}] Upload Failed For ""{key}"": {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                 {
                     Console.WriteLine($"Retrying In {delay.TotalSeconds:F0}s ...");
 

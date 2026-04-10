@@ -18,13 +18,13 @@ namespace Distribution.UnpackResourceFiles;
 /// </remarks>
 internal partial class UnpackResourceFiles
 {
-    private const int DefaultMaxRetries = 5;
+    private const int DefaultMaximumRetries = 5;
     private static readonly TimeSpan InitialRetryDelay = TimeSpan.FromSeconds(1);
 
-    internal static int Main(string[] args)
+    internal static int Main(string[] arguments)
     {
-        string parentDirectory = args.Length >= 1 ? args[0] : Environment.CurrentDirectory;
-        int maxRetries = args.Length >= 2 ? int.Parse(args[1]) : DefaultMaxRetries;
+        string parentDirectory = arguments.Length >= 1 ? arguments[0] : Environment.CurrentDirectory;
+        int maximumRetries = arguments.Length >= 2 ? int.Parse(arguments[1]) : DefaultMaximumRetries;
 
         string[] archives = Directory.GetFiles(parentDirectory, "*.s2z", SearchOption.AllDirectories);
 
@@ -46,16 +46,16 @@ internal partial class UnpackResourceFiles
 
             Console.WriteLine($@"Unpacking ""{archive}"" → ""{outputDirectory}""");
 
-            if (ExtractWithRetry(archive, outputDirectory, maxRetries))
+            if (ExtractWithRetry(archive, outputDirectory, maximumRetries))
             {
-                DeleteFileWithRetry(archive, maxRetries);
+                DeleteFileWithRetry(archive, maximumRetries);
 
                 succeeded++;
             }
 
             else
             {
-                Console.WriteLine($@"Failed To Unpack ""{archive}"" After {maxRetries} Attempts");
+                Console.WriteLine($@"Failed To Unpack ""{archive}"" After {maximumRetries} Attempts");
 
                 failed++;
             }
@@ -117,11 +117,11 @@ internal partial class UnpackResourceFiles
     /// <summary>
     ///     Extracts a ZIP archive to the specified directory with retry and exponential backoff.
     /// </summary>
-    private static bool ExtractWithRetry(string archivePath, string outputDirectory, int maxRetries)
+    private static bool ExtractWithRetry(string archivePath, string outputDirectory, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -134,9 +134,9 @@ internal partial class UnpackResourceFiles
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"Attempt {attempt}/{maxRetries} Failed For ""{archivePath}"": {exception.Message}");
+                Console.WriteLine($@"Attempt {attempt}/{maximumRetries} Failed For ""{archivePath}"": {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                     Thread.Sleep(delay);
 
                 delay = InitialRetryDelay * (1 << attempt);
@@ -149,11 +149,11 @@ internal partial class UnpackResourceFiles
     /// <summary>
     ///     Deletes a file with retry and exponential backoff to handle transient file locks.
     /// </summary>
-    private static void DeleteFileWithRetry(string filePath, int maxRetries)
+    private static void DeleteFileWithRetry(string filePath, int maximumRetries)
     {
         TimeSpan delay = InitialRetryDelay;
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        for (int attempt = 1; attempt <= maximumRetries; attempt++)
         {
             try
             {
@@ -164,16 +164,16 @@ internal partial class UnpackResourceFiles
 
             catch (Exception exception)
             {
-                Console.WriteLine($@"Attempt {attempt}/{maxRetries} To Delete ""{filePath}"" Failed: {exception.Message}");
+                Console.WriteLine($@"Attempt {attempt}/{maximumRetries} To Delete ""{filePath}"" Failed: {exception.Message}");
 
-                if (attempt < maxRetries)
+                if (attempt < maximumRetries)
                     Thread.Sleep(delay);
 
                 delay = InitialRetryDelay * (1 << attempt);
             }
         }
 
-        Console.WriteLine($@"Failed To Delete ""{filePath}"" After {maxRetries} Attempts");
+        Console.WriteLine($@"Failed To Delete ""{filePath}"" After {maximumRetries} Attempts");
     }
 
     [GeneratedRegex(@"\d+$")]

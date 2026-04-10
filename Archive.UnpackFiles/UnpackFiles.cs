@@ -1,6 +1,6 @@
 ﻿using System.IO.Compression;
 
-namespace Distribution.UnpackFiles;
+namespace Archive.UnpackFiles;
 
 /// <summary>
 ///     Unpacks the zip files in the directory and deletes the zip files after unpacking. 

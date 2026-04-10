@@ -1,8 +1,8 @@
 <Solution>
     <Project Path="Archive.ConsolidateVersions/Archive.ConsolidateVersions.csproj" />
+    <Project Path="Archive.UnpackFiles/Archive.UnpackFiles.csproj" />
     <Project Path="Distribution.CheckFileSizes/Distribution.CheckFileSizes.csproj" />
     <Project Path="Distribution.DeleteFromObjectStorage/Distribution.DeleteFromObjectStorage.csproj" />
     <Project Path="Distribution.DownloadFromObjectStorage/Distribution.DownloadFromObjectStorage.csproj" />
-    <Project Path="Distribution.UnpackFiles/Distribution.UnpackFiles.csproj" />
     <Project Path="Distribution.UploadToObjectStorage/Distribution.UploadToObjectStorage.csproj" />
 </Solution>

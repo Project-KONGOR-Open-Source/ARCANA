@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Xml;
 
-namespace Distribution.CheckFileSizes;
+namespace Archive.CheckFileSizes;
 
 /// <summary>
 ///     Checks the file sizes of the zip files in the manifest against the actual zip files in the directory.
@@ -12,7 +12,7 @@ namespace Distribution.CheckFileSizes;
 ///     Example Usage:
 ///
 ///     <code>
-///         ./Distribution.CheckFileSizes.exe "path/to/directory"
+///         ./Archive.CheckFileSizes.exe "path/to/directory"
 ///     </code>
 /// </remarks>
 internal class CheckFileSizes

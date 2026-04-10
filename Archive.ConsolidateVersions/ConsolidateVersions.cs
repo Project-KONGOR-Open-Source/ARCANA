@@ -3,7 +3,7 @@
 /// <summary>
 ///     Consolidates multiple versions of a project into a single version by moving files from each version on top of the previous version, starting from the oldest version to the latest version.
 ///     After all versions have been consolidated, the oldest version is renamed to the latest version.
-///     This process helps to maintain a clean and organized directory structure while preserving the history of changes across different versions.
+///     This process helps to maintain a clean and organised directory structure while preserving the history of changes across different versions.
 /// </summary>
 /// <remarks>
 ///     Example Usage:

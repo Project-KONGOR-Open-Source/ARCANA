@@ -63,7 +63,7 @@ internal class CreateManifest
 
             (excludeFromSource, excludeFromTarget) = await LoadExclusionsAsync(manifestPath);
 
-            if (excludeFromSource.Contains(ManifestFileName) is false)
+            if (excludeFromSource.Contains(ManifestFileName, StringComparer.OrdinalIgnoreCase) is false)
                 excludeFromSource.Insert(0, ManifestFileName);
         }
 

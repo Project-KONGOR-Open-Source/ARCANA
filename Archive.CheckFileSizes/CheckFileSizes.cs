@@ -36,11 +36,20 @@ internal class CheckFileSizes
 
             for (int index = 0; index < files.Count; index++)
             {
-                XmlNode file = files[index] ?? throw new NullReferenceException($"File Index {index} Is NULL");
+                XmlNode file = files[index] ?? throw new NullReferenceException($"File At Index {index} Is NULL");
 
-                string filePath = Path.Combine(parentDirectory, file.Attributes!["path"]!.Value + ".zip");
+                XmlAttributeCollection attributes = file.Attributes
+                    ?? throw new InvalidOperationException($"File At Index {index} Has No Attributes");
 
-                long manifestZipSize = long.Parse(file.Attributes!["zipsize"]!.Value);
+                string path = attributes["path"]?.Value
+                    ?? throw new InvalidOperationException($@"File At Index {index} Is Missing ""path"" Attribute");
+
+                string zipSize = attributes["zipsize"]?.Value
+                    ?? throw new InvalidOperationException($@"File At Index {index} Is Missing ""zipsize"" Attribute");
+
+                string filePath = Path.Combine(parentDirectory, path + ".zip");
+
+                long manifestZipSize = long.Parse(zipSize);
                 long fileZipSize = new FileInfo(filePath).Length;
 
                 if (fileZipSize.Equals(manifestZipSize).Equals(false))

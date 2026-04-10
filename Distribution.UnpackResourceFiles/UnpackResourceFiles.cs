@@ -21,6 +21,10 @@ internal partial class UnpackResourceFiles
     private const int DefaultMaximumRetries = 5;
     private static readonly TimeSpan InitialRetryDelay = TimeSpan.FromSeconds(1);
 
+    private static readonly StringComparer FileSystemStringComparer = OperatingSystem.IsWindows()
+        ? StringComparer.OrdinalIgnoreCase
+        : StringComparer.Ordinal;
+
     internal static int Main(string[] arguments)
     {
         string parentDirectory = arguments.Length >= 1 ? arguments[0] : Environment.CurrentDirectory;
@@ -72,15 +76,17 @@ internal partial class UnpackResourceFiles
     /// </summary>
     private static Dictionary<string, string> BuildOutputDirectoryMap(string[] archives)
     {
-        Dictionary<string, string> map = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, string> map = new(FileSystemStringComparer);
 
-        IEnumerable<IGrouping<string, string>> archivesByDirectory = archives.GroupBy(Path.GetDirectoryName, StringComparer.OrdinalIgnoreCase)!;
+        IEnumerable<IGrouping<string, string>> archivesByDirectory = archives
+            .GroupBy(archive => Path.GetDirectoryName(archive)
+                ?? throw new InvalidOperationException($@"Unable To Determine Parent Directory For Archive ""{archive}"""), FileSystemStringComparer);
 
         foreach (IGrouping<string, string> group in archivesByDirectory)
         {
-            string directory = group.Key!;
+            string directory = group.Key;
 
-            Dictionary<string, List<string>> splitGroups = new(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, List<string>> splitGroups = new(FileSystemStringComparer);
 
             foreach (string archive in group)
             {

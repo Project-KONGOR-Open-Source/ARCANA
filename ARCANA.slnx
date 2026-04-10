@@ -2,6 +2,7 @@
     <Project Path="Archive.ConsolidateVersions/Archive.ConsolidateVersions.csproj" />
     <Project Path="Archive.UnpackFiles/Archive.UnpackFiles.csproj" />
     <Project Path="Archive.CheckFileSizes/Archive.CheckFileSizes.csproj" />
+    <Project Path="Distribution.CreateManifest/Distribution.CreateManifest.csproj" />
     <Project Path="Distribution.DeleteFromObjectStorage/Distribution.DeleteFromObjectStorage.csproj" />
     <Project Path="Distribution.DownloadFromObjectStorage/Distribution.DownloadFromObjectStorage.csproj" />
     <Project Path="Distribution.PackResourceFiles/Distribution.PackResourceFiles.csproj" />

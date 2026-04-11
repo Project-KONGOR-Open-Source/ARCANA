@@ -27,6 +27,7 @@ internal class UploadToObjectStorage
     {
         if (arguments is ["--help" or "-h"])
         {
+            Console.WriteLine();
             Console.WriteLine("Description:");
             Console.WriteLine("  Uploads all files from a local directory to an S3-compatible bucket.");
             Console.WriteLine();
@@ -41,6 +42,7 @@ internal class UploadToObjectStorage
             Console.WriteLine("  <secretKey>    secret access key");
             Console.WriteLine("  [maxRetries]   maximum retry attempts per file (default: 5)");
             Console.WriteLine("  [keyPrefix]    prefix to prepend to all uploaded keys (e.g. wac/4.10.1)");
+            Console.WriteLine();
 
             return 0;
         }

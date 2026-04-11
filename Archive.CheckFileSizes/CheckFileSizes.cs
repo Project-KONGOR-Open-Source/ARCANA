@@ -21,6 +21,7 @@ internal class CheckFileSizes
     {
         if (arguments is ["--help" or "-h"])
         {
+            Console.WriteLine();
             Console.WriteLine("Description:");
             Console.WriteLine("  Checks file sizes of zip files against a manifest to verify archive integrity.");
             Console.WriteLine();
@@ -29,6 +30,7 @@ internal class CheckFileSizes
             Console.WriteLine();
             Console.WriteLine("Arguments:");
             Console.WriteLine("  [directory]  directory containing manifest.xml.zip and zip files (default: current directory)");
+            Console.WriteLine();
 
             return;
         }

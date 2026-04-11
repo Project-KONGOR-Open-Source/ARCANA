@@ -27,6 +27,7 @@ internal class DeleteFromObjectStorage
     {
         if (arguments is ["--help" or "-h"])
         {
+            Console.WriteLine();
             Console.WriteLine("Description:");
             Console.WriteLine("  Deletes all objects under a given key prefix from an S3-compatible bucket.");
             Console.WriteLine();
@@ -40,6 +41,7 @@ internal class DeleteFromObjectStorage
             Console.WriteLine("  <secretKey>    secret access key");
             Console.WriteLine("  <keyPrefix>    key prefix (folder) to delete from (e.g. wac/4.10.1)");
             Console.WriteLine("  [maxRetries]   maximum retry attempts per deletion (default: 5)");
+            Console.WriteLine();
 
             return 0;
         }

@@ -27,6 +27,7 @@ internal class DownloadFromObjectStorage
     {
         if (arguments is ["--help" or "-h"])
         {
+            Console.WriteLine();
             Console.WriteLine("Description:");
             Console.WriteLine("  Downloads all objects under a given key prefix from an S3-compatible bucket to a local directory.");
             Console.WriteLine();
@@ -41,6 +42,7 @@ internal class DownloadFromObjectStorage
             Console.WriteLine("  <secretKey>    secret access key");
             Console.WriteLine("  <keyPrefix>    key prefix (folder) to download from (e.g. wac/4.10.1)");
             Console.WriteLine("  [maxRetries]   maximum retry attempts per file (default: 5)");
+            Console.WriteLine();
 
             return 0;
         }

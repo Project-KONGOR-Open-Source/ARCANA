@@ -18,6 +18,7 @@ internal class ConsolidateVersions
     {
         if (arguments is ["--help" or "-h"])
         {
+            Console.WriteLine();
             Console.WriteLine("Description:");
             Console.WriteLine("  Consolidates multiple version directories into a single version by layering files");
             Console.WriteLine("  from newest to oldest, then renaming the result to the latest version.");
@@ -27,6 +28,7 @@ internal class ConsolidateVersions
             Console.WriteLine();
             Console.WriteLine("Arguments:");
             Console.WriteLine("  [directory]  parent directory containing version subdirectories (default: current directory)");
+            Console.WriteLine();
 
             return;
         }

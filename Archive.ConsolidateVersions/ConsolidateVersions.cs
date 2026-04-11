@@ -16,7 +16,7 @@ internal class ConsolidateVersions
 {
     internal static void Main(string[] arguments)
     {
-        if (arguments is ["--help" or "-h"])
+        if (arguments.Any(argument => argument is "--help" or "-h"))
         {
             Console.WriteLine();
             Console.WriteLine("Description:");

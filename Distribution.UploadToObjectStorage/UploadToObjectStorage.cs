@@ -25,7 +25,7 @@ internal class UploadToObjectStorage
 
     internal static async Task<int> Main(string[] arguments)
     {
-        if (arguments is ["--help" or "-h"])
+        if (arguments.Any(argument => argument is "--help" or "-h"))
         {
             Console.WriteLine();
             Console.WriteLine("Description:");

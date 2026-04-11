@@ -19,6 +19,20 @@ internal class CheckFileSizes
 {
     internal static void Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Checks file sizes of zip files against a manifest to verify archive integrity.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Archive.CheckFileSizes [directory]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  [directory]  directory containing manifest.xml.zip and zip files (default: current directory)");
+
+            return;
+        }
+
         string parentDirectory = arguments.Length is 1 ? arguments.Single() : Environment.CurrentDirectory;
 
         string manifestZipFile = Path.Combine(parentDirectory, "manifest.xml.zip");

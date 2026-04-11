@@ -25,6 +25,26 @@ internal class DownloadFromObjectStorage
 
     internal static async Task<int> Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Downloads all objects under a given key prefix from an S3-compatible bucket to a local directory.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Distribution.DownloadFromObjectStorage <directory> <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  <directory>    local directory to download files into");
+            Console.WriteLine("  <bucket>       S3 bucket name");
+            Console.WriteLine("  <serviceUrl>   S3-compatible service URL (e.g. https://ACCOUNT_ID.r2.cloudflarestorage.com)");
+            Console.WriteLine("  <accessKey>    access key ID");
+            Console.WriteLine("  <secretKey>    secret access key");
+            Console.WriteLine("  <keyPrefix>    key prefix (folder) to download from (e.g. wac/4.10.1)");
+            Console.WriteLine("  [maxRetries]   maximum retry attempts per file (default: 5)");
+
+            return 0;
+        }
+
         if (arguments.Length < 6)
         {
             Console.WriteLine("USAGE: Distribution.DownloadFromObjectStorage <directory> <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries]");

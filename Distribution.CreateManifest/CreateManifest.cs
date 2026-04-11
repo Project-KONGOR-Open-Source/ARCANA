@@ -36,6 +36,21 @@ internal class CreateManifest
 
     internal static async Task<int> Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Generates or updates a manifest.json for a directory, listing every file with its size and SHA-256 hash.");
+            Console.WriteLine("  Preserves hand-edited exclusion lists from an existing manifest.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Distribution.CreateManifest <directory>");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  <directory>  directory to scan and generate the manifest for");
+
+            return 0;
+        }
+
         if (arguments.Length < 1)
         {
             Console.WriteLine("USAGE: Distribution.CreateManifest <directory>");

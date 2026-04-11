@@ -16,6 +16,21 @@ internal class ConsolidateVersions
 {
     internal static void Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Consolidates multiple version directories into a single version by layering files");
+            Console.WriteLine("  from newest to oldest, then renaming the result to the latest version.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Archive.ConsolidateVersions [directory]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  [directory]  parent directory containing version subdirectories (default: current directory)");
+
+            return;
+        }
+
         string parentDirectory = arguments.Length is 1 ? arguments.Single() : Environment.CurrentDirectory;
 
         string[] directories = Directory.GetDirectories(parentDirectory).OrderByDescending(path => new Version(new DirectoryInfo(path).Name)).ToArray();

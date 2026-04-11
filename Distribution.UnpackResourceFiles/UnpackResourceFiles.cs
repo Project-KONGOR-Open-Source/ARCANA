@@ -27,6 +27,22 @@ internal partial class UnpackResourceFiles
 
     internal static int Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Unpacks S2Z resource archives (ZIP format) into directories with an .s2z suffix.");
+            Console.WriteLine("  Each archive is deleted after successful extraction.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Distribution.UnpackResourceFiles [directory] [maxRetries]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  [directory]   directory containing .s2z archives (default: current directory)");
+            Console.WriteLine("  [maxRetries]  maximum retry attempts per archive (default: 5)");
+
+            return 0;
+        }
+
         string parentDirectory = arguments.Length >= 1 ? arguments[0] : Environment.CurrentDirectory;
         int maximumRetries = arguments.Length >= 2 ? int.Parse(arguments[1]) : DefaultMaximumRetries;
 

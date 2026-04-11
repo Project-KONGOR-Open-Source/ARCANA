@@ -25,6 +25,26 @@ internal class UploadToObjectStorage
 
     internal static async Task<int> Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Uploads all files from a local directory to an S3-compatible bucket.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Distribution.UploadToObjectStorage <directory> <bucket> <serviceUrl> <accessKey> <secretKey> [maxRetries] [keyPrefix]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  <directory>    local directory to upload files from");
+            Console.WriteLine("  <bucket>       S3 bucket name");
+            Console.WriteLine("  <serviceUrl>   S3-compatible service URL (e.g. https://ACCOUNT_ID.r2.cloudflarestorage.com)");
+            Console.WriteLine("  <accessKey>    access key ID");
+            Console.WriteLine("  <secretKey>    secret access key");
+            Console.WriteLine("  [maxRetries]   maximum retry attempts per file (default: 5)");
+            Console.WriteLine("  [keyPrefix]    prefix to prepend to all uploaded keys (e.g. wac/4.10.1)");
+
+            return 0;
+        }
+
         if (arguments.Length < 5)
         {
             Console.WriteLine("USAGE: Distribution.UploadToObjectStorage <directory> <bucket> <serviceUrl> <accessKey> <secretKey> [maxRetries] [keyPrefix]");

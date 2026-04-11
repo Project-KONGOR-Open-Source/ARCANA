@@ -22,6 +22,22 @@ internal class PackResourceFiles
 
     internal static int Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Packs directories with an .s2z suffix back into S2Z archives (ZIP format).");
+            Console.WriteLine("  Each source directory is deleted after the archive is successfully created.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Distribution.PackResourceFiles [directory] [maxRetries]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  [directory]   parent directory containing .s2z directories (default: current directory)");
+            Console.WriteLine("  [maxRetries]  maximum retry attempts per directory (default: 5)");
+
+            return 0;
+        }
+
         string parentDirectory = arguments.Length >= 1 ? arguments[0] : Environment.CurrentDirectory;
         int maximumRetries = arguments.Length >= 2 ? int.Parse(arguments[1]) : DefaultMaximumRetries;
 

@@ -18,6 +18,22 @@ internal class UnpackFiles
 {
     internal static void Main(string[] arguments)
     {
+        if (arguments is ["--help" or "-h"])
+        {
+            Console.WriteLine("Description:");
+            Console.WriteLine("  Unpacks zip files in a directory and deletes them after unpacking.");
+            Console.WriteLine("  Optionally bundles resource files into individual zip archives.");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  Archive.UnpackFiles [directory] [bundleResourceFiles]");
+            Console.WriteLine();
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("  [directory]            directory containing zip files (default: current directory)");
+            Console.WriteLine("  [bundleResourceFiles]  true/false — bundle .s2z resource files into zip archives (default: false)");
+
+            return;
+        }
+
         string parentDirectory = arguments.Length is 1 ? arguments.Single() : arguments.Length is 2 ? arguments.First() : Environment.CurrentDirectory;
 
         bool bundleResourceFiles = arguments.Length is 2 ? bool.Parse(arguments.Last()) : false;

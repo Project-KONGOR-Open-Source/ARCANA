@@ -23,7 +23,7 @@ namespace Distribution.CreateManifest;
 internal class CreateManifest
 {
     private const string ManifestFileName = "manifest.json";
-    private const string ManifestVersion = "1.0.0";
+    private const string DefaultManifestVersion = "1.0.0";
     private const string HashAlgorithmName = "SHA-256";
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
@@ -71,14 +71,16 @@ internal class CreateManifest
 
         string manifestPath = Path.Combine(directory, ManifestFileName);
 
+        string version = DefaultManifestVersion;
+
         List<string> excludeFromSource = [ManifestFileName];
         List<string> excludeFromTarget = [];
 
         if (File.Exists(manifestPath))
         {
-            Console.WriteLine("Loading Existing Manifest Exclusions");
+            Console.WriteLine("Loading Existing Manifest Metadata");
 
-            (excludeFromSource, excludeFromTarget) = await LoadExclusionsAsync(manifestPath);
+            (version, excludeFromSource, excludeFromTarget) = await LoadExistingMetadataAsync(manifestPath);
 
             if (excludeFromSource.Contains(ManifestFileName, StringComparer.OrdinalIgnoreCase) is false)
                 excludeFromSource.Insert(0, ManifestFileName);
@@ -122,7 +124,7 @@ internal class CreateManifest
 
         JsonObject manifest = new()
         {
-            ["version"] = ManifestVersion,
+            ["version"] = version,
             ["hashAlgorithm"] = HashAlgorithmName,
             ["excludeFromSource"] = new JsonArray(excludeFromSource.Select(pattern => (JsonNode)pattern).ToArray()),
             ["excludeFromTarget"] = new JsonArray(excludeFromTarget.Select(pattern => (JsonNode)pattern).ToArray()),
@@ -139,11 +141,13 @@ internal class CreateManifest
         return 0;
     }
 
-    private static async Task<(List<string> ExcludeFromSource, List<string> ExcludeFromTarget)> LoadExclusionsAsync(string manifestPath)
+    private static async Task<(string Version, List<string> ExcludeFromSource, List<string> ExcludeFromTarget)> LoadExistingMetadataAsync(string manifestPath)
     {
         await using FileStream stream = File.OpenRead(manifestPath);
 
         JsonNode? root = await JsonNode.ParseAsync(stream);
+
+        string version = root?["version"]?.GetValue<string>() ?? DefaultManifestVersion;
 
         List<string> excludeFromSource = root?["excludeFromSource"]?
             .AsArray()
@@ -157,7 +161,7 @@ internal class CreateManifest
             .Select(node => node.GetValue<string>())
             .ToList() ?? [];
 
-        return (excludeFromSource, excludeFromTarget);
+        return (version, excludeFromSource, excludeFromTarget);
     }
 
     private static List<string> GetMatchingFiles(string directory, List<string> excludePatterns)

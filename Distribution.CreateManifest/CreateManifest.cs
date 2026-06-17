@@ -24,7 +24,7 @@ namespace Distribution.CreateManifest;
 internal class CreateManifest
 {
     private const string ManifestFileName = "manifest.json";
-    private const string DefaultManifestVersion = "1.0.0";
+    private const string DefaultManifestVersion = "1.0.0.0";
     private const string HashAlgorithmName = "SHA-256";
     private const string VersionTimestampFormat = "yyyyMMdd";
 

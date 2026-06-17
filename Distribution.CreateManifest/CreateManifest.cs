@@ -11,6 +11,7 @@ namespace Distribution.CreateManifest;
 /// <summary>
 ///     Generates or updates a manifest file (<c>manifest.json</c>) for a local directory, listing every file with its size and SHA-256 hash.
 ///     When an existing manifest is found, hand-edited exclusion lists are preserved. Files matching <c>excludeFromTarget</c> globs are omitted from the listing.
+///     The last segment of the manifest <c>version</c> is stamped with the current date (<c>yyyyMMdd</c>) on every run.
 ///     The manifest file itself is always excluded from the file listing and included in <c>excludeFromSource</c>.
 /// </summary>
 /// <remarks>
@@ -25,6 +26,7 @@ internal class CreateManifest
     private const string ManifestFileName = "manifest.json";
     private const string DefaultManifestVersion = "1.0.0";
     private const string HashAlgorithmName = "SHA-256";
+    private const string VersionTimestampFormat = "yyyyMMdd";
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -86,6 +88,10 @@ internal class CreateManifest
                 excludeFromSource.Insert(0, ManifestFileName);
         }
 
+        version = StampVersionTimestamp(version);
+
+        Console.WriteLine($@"Manifest Version Stamped As ""{version}""");
+
         Console.WriteLine($@"Scanning Directory ""{directory}""");
 
         List<string> relativePaths = GetMatchingFiles(directory, excludeFromTarget);
@@ -139,6 +145,17 @@ internal class CreateManifest
         Console.WriteLine($@"Manifest Written To ""{manifestPath}"" With {relativePaths.Count} Files");
 
         return 0;
+    }
+
+    private static string StampVersionTimestamp(string version)
+    {
+        string timestamp = DateTime.Now.ToString(VersionTimestampFormat);
+
+        string[] segments = version.Split('.');
+
+        segments[^1] = timestamp;
+
+        return string.Join('.', segments);
     }
 
     private static async Task<(string Version, List<string> ExcludeFromSource, List<string> ExcludeFromTarget)> LoadExistingMetadataAsync(string manifestPath)

@@ -25,7 +25,7 @@
 > Terminology
 >    - archive : the collection of a distribution's incremental versions; this will be composed of multiple directories along the lines of `4.8.6`, `...`, `4.10.1`
 >    - distribution : the collection of files that make up a client or a server for a particular platform; a distribution's name is a 3-letter code, sometimes followed by a secret key to mask the files over the CDN; distribution name examples include `wac` and `las`
->        - the first letter represents the distribution's platform, and is one of `w` for Windows, `l` for Linux, or `m` for macOS
+>        - the first letter represents the distribution's platform, and is either `w` for Windows or `l` for Linux
 >        - the second letter represents the distribution's target, and is one of `a` for International, `g` for Garena, `r` for RCT, or `t` for SBT
 >        - the third letter represents the distribution's type, and is either `c` for client, or `s` for server
 

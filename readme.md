@@ -17,7 +17,9 @@
     - **UnpackResourceFiles** : Used to unpack S2Z resource archives (ZIP format) into directories with an `.s2z` suffix. Each archive is deleted after successful extraction. Failed operations are retried with exponential backoff.
     - **UploadToObjectStorage** : Used to upload all files from a local directory to an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3. Tracks total progress as file count and percentage, retries failed uploads with exponential backoff, and logs failures to the console.
     - **DownloadFromObjectStorage** : Used to download all objects under a given key prefix from an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3 to a local directory. Preserves the relative directory structure, tracks total progress as file count and percentage, retries failed downloads with exponential backoff, and logs failures to the console.
-    - **DeleteFromObjectStorage** : Used to delete all objects under a given key prefix from an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3. Tracks total progress as object count and percentage, retries failed deletions with exponential backoff, and logs failures to the console.
+    - **ListObjectStorage** : Used to list all objects under a given key prefix in an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3, without changing anything. Prints one key and its size per line, sorted by key, so that the output can be compared and read by other tools.
+    - **DeleteFromObjectStorage** : Used to delete all objects under a given key prefix from an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3. Optionally, deletes only the exact keys listed in a file, and nothing at all unless every one of them exists. Tracks total progress as object count and percentage, retries failed deletions with exponential backoff, and logs failures to the console.
+    - **CreateManifest** : Used to generate or update a distribution's `manifest.json`, listing every file with its size, its SHA-256 hash, and whether it is a program that needs the execute permission. Preserves hand-edited exclusion lists, and the executable version, from an existing manifest.
 
 <br/>
 
@@ -37,8 +39,10 @@ The workflow for the tools above is the following:
   3. unpack the archive's ZIP files and, optionally, bundle the S2Z resource directories
   4. we should now have a clean client or server distribution, ready to be run
   5. optionally, unpack S2Z resource archives for inspection or modding, and pack them back when done
-  6. optionally, upload the distribution's files to S3-compatible object storage
-  7. optionally, delete objects from S3-compatible object storage when they are no longer needed
+  6. optionally, generate the distribution's manifest
+  7. optionally, list the objects in S3-compatible object storage, to check what is there before uploading or deleting
+  8. optionally, upload the distribution's files to S3-compatible object storage
+  9. optionally, delete objects from S3-compatible object storage when they are no longer needed
 
 <hr/>
 
@@ -109,3 +113,25 @@ The first six arguments are required. Optional 7th argument: maximum retry attem
 ```
 
 The first five arguments are required. Optional 6th argument: maximum retry attempts per deletion batch (default: `5`).
+
+To delete only some objects, list their keys in a file, one per line, and add `--exact-keys` with the file's path. The tool lists the objects under the prefix first, and deletes nothing at all unless every key in the file exists exactly as written, so a key is never treated as a prefix:
+
+```
+./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "mac/" --exact-keys "keys.txt"
+```
+
+**Distribution.ListObjectStorage**
+
+```
+./Distribution.ListObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/game/"
+```
+
+All five arguments are required; an empty key prefix lists the whole bucket. Each line holds an object's key and its size in bytes, separated by a tab.
+
+**Distribution.CreateManifest**
+
+```
+./Distribution.CreateManifest.exe "path/to/directory" --version-executable 5.26.10.31
+```
+
+The first argument is the distribution's directory. `--version-executable` is the version the distribution's programs were built with, written as `5.YY.MM.DD`, whose date must exist; it is required unless the directory's existing manifest has one.

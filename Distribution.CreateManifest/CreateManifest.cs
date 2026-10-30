@@ -9,24 +9,24 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 namespace Distribution.CreateManifest;
 
 /// <summary>
-///     Generates or updates a manifest file (<c>manifest.json</c>) for a local directory, listing every file with its size and SHA-256 hash.
+///     Generates or updates a manifest file (<c>manifest.json</c>) for a local directory, listing every file with its size, its SHA-256 hash, and whether it is a program that needs the execute permission.
 ///     When an existing manifest is found, hand-edited exclusion lists are preserved. Files matching <c>excludeFromTarget</c> globs are omitted from the listing.
-///     The last segment of the manifest <c>version</c> is stamped with the current date (<c>yyyyMMdd</c>) on every run.
+///     The manifest carries two versions: <c>versionResources</c>, the date of the run in UTC, and <c>versionExecutable</c>, the version the distribution's binaries were built with, which is given on the command line or kept from the existing manifest.
 ///     The manifest file itself is always excluded from the file listing and included in <c>excludeFromSource</c>.
 /// </summary>
 /// <remarks>
 ///     Example Usage:
 ///
 ///     <code>
-///         ./Distribution.CreateManifest.exe "path/to/directory"
+///         ./Distribution.CreateManifest.exe "path/to/directory" --version-executable 5.26.10.31
 ///     </code>
 /// </remarks>
 internal class CreateManifest
 {
     private const string ManifestFileName = "manifest.json";
-    private const string DefaultManifestVersion = "1.0.0.0";
     private const string HashAlgorithmName = "SHA-256";
-    private const string VersionTimestampFormat = "yyyyMMdd";
+    private const string VersionExecutableOption = "--version-executable";
+    private const string Usage = "USAGE: Distribution.CreateManifest <directory> [--version-executable 5.YY.MM.DD]";
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -42,38 +42,67 @@ internal class CreateManifest
         {
             Console.WriteLine();
             Console.WriteLine("Description:");
-            Console.WriteLine("  Generates or updates a manifest.json for a directory, listing every file with its size and SHA-256 hash.");
-            Console.WriteLine("  Preserves hand-edited exclusion lists from an existing manifest.");
+            Console.WriteLine("  Generates or updates a manifest.json for a directory, listing every file with its size, its SHA-256 hash, and whether it is a program.");
+            Console.WriteLine("  Records two versions: versionResources, the date of the run in UTC, and versionExecutable, the version the binaries were built with.");
+            Console.WriteLine("  Preserves hand-edited exclusion lists, and the executable version, from an existing manifest.");
             Console.WriteLine();
             Console.WriteLine("Usage:");
-            Console.WriteLine("  Distribution.CreateManifest <directory>");
+            Console.WriteLine("  Distribution.CreateManifest <directory> [--version-executable 5.YY.MM.DD]");
             Console.WriteLine();
             Console.WriteLine("Arguments:");
-            Console.WriteLine("  <directory>  directory to scan and generate the manifest for");
+            Console.WriteLine("  <directory>                       directory to scan and generate the manifest for");
+            Console.WriteLine("  --version-executable 5.YY.MM.DD   the binaries' version; required unless the existing manifest has one");
             Console.WriteLine();
 
             return 0;
         }
 
-        if (arguments.Length < 1)
+        string? directory = null;
+        string? versionExecutable = null;
+
+        for (int index = 0; index < arguments.Length; index++)
         {
-            Console.WriteLine("USAGE: Distribution.CreateManifest <directory>");
+            string argument = arguments[index];
+
+            if (argument is VersionExecutableOption && index + 1 < arguments.Length)
+                versionExecutable = arguments[++index];
+
+            else if (argument.StartsWith('-') is false && directory is null)
+                directory = argument;
+
+            else
+            {
+                Console.WriteLine(Usage);
+
+                return 1;
+            }
+        }
+
+        if (directory is null)
+        {
+            Console.WriteLine(Usage);
 
             return 1;
         }
 
-        string directory = Path.GetFullPath(arguments[0]);
+        return await Run(Path.GetFullPath(directory), versionExecutable, DateTime.UtcNow, Console.Error);
+    }
 
+    /// <summary>
+    ///     Writes the manifest for <paramref name="directory"/>, and returns 0 on success, or 1 after writing the reason to <paramref name="error"/>, in which case nothing is written.
+    /// </summary>
+    internal static async Task<int> Run(string directory, string? versionExecutable, DateTime utcNow, TextWriter error)
+    {
         if (Directory.Exists(directory) is false)
         {
-            Console.WriteLine($@"Directory ""{directory}"" Does Not Exist");
+            await error.WriteLineAsync($@"Directory ""{directory}"" Does Not Exist");
 
             return 1;
         }
 
         string manifestPath = Path.Combine(directory, ManifestFileName);
 
-        string version = DefaultManifestVersion;
+        string? existingVersionExecutable = null;
 
         List<string> excludeFromSource = [ManifestFileName];
         List<string> excludeFromTarget = [];
@@ -82,15 +111,31 @@ internal class CreateManifest
         {
             Console.WriteLine("Loading Existing Manifest Metadata");
 
-            (version, excludeFromSource, excludeFromTarget) = await LoadExistingMetadataAsync(manifestPath);
+            (existingVersionExecutable, excludeFromSource, excludeFromTarget) = await LoadExistingMetadataAsync(manifestPath);
 
             if (excludeFromSource.Contains(ManifestFileName, StringComparer.OrdinalIgnoreCase) is false)
                 excludeFromSource.Insert(0, ManifestFileName);
         }
 
-        version = StampVersionTimestamp(version);
+        versionExecutable ??= existingVersionExecutable;
 
-        Console.WriteLine($@"Manifest Version Stamped As ""{version}""");
+        if (versionExecutable is null)
+        {
+            await error.WriteLineAsync($@"No Executable Version: Pass ""{VersionExecutableOption} 5.YY.MM.DD"" With The Version The Binaries Were Built With; Later Runs Keep It");
+
+            return 1;
+        }
+
+        if (ManifestVersion.IsValid(versionExecutable) is false)
+        {
+            await error.WriteLineAsync($@"Invalid Executable Version ""{versionExecutable}"": Expected A Whole Version 5, ""5.YY.MM.DD"", Whose Date Exists");
+
+            return 1;
+        }
+
+        string versionResources = ManifestVersion.FromDate(utcNow);
+
+        Console.WriteLine($@"Resources Version ""{versionResources}"", Executable Version ""{versionExecutable}""");
 
         Console.WriteLine($@"Scanning Directory ""{directory}""");
 
@@ -118,7 +163,8 @@ internal class CreateManifest
             filesObject[relativePath] = new JsonObject
             {
                 ["size"] = size,
-                ["hash"] = hash
+                ["hash"] = hash,
+                ["executable"] = ExecutableDetection.IsExecutable(fullPath)
             };
 
             hashed++;
@@ -130,7 +176,8 @@ internal class CreateManifest
 
         JsonObject manifest = new()
         {
-            ["version"] = version,
+            ["versionResources"] = versionResources,
+            ["versionExecutable"] = versionExecutable,
             ["hashAlgorithm"] = HashAlgorithmName,
             ["excludeFromSource"] = new JsonArray(excludeFromSource.Select(pattern => (JsonNode)pattern).ToArray()),
             ["excludeFromTarget"] = new JsonArray(excludeFromTarget.Select(pattern => (JsonNode)pattern).ToArray()),
@@ -147,24 +194,13 @@ internal class CreateManifest
         return 0;
     }
 
-    private static string StampVersionTimestamp(string version)
-    {
-        string timestamp = DateTime.Now.ToString(VersionTimestampFormat);
-
-        string[] segments = version.Split('.');
-
-        segments[^1] = timestamp;
-
-        return string.Join('.', segments);
-    }
-
-    private static async Task<(string Version, List<string> ExcludeFromSource, List<string> ExcludeFromTarget)> LoadExistingMetadataAsync(string manifestPath)
+    private static async Task<(string? VersionExecutable, List<string> ExcludeFromSource, List<string> ExcludeFromTarget)> LoadExistingMetadataAsync(string manifestPath)
     {
         await using FileStream stream = File.OpenRead(manifestPath);
 
         JsonNode? root = await JsonNode.ParseAsync(stream);
 
-        string version = root?["version"]?.GetValue<string>() ?? DefaultManifestVersion;
+        string? versionExecutable = root?["versionExecutable"]?.GetValue<string>();
 
         List<string> excludeFromSource = root?["excludeFromSource"]?
             .AsArray()
@@ -178,7 +214,7 @@ internal class CreateManifest
             .Select(node => node.GetValue<string>())
             .ToList() ?? [];
 
-        return (version, excludeFromSource, excludeFromTarget);
+        return (versionExecutable, excludeFromSource, excludeFromTarget);
     }
 
     private static List<string> GetMatchingFiles(string directory, List<string> excludePatterns)

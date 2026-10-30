@@ -12,4 +12,8 @@
         <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.*" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Distribution.CreateManifest.Tests" />
+    </ItemGroup>
+
 </Project>

@@ -18,7 +18,7 @@
     - **UploadToObjectStorage** : Used to upload all files from a local directory to an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3. Tracks total progress as file count and percentage, retries failed uploads with exponential backoff, and logs failures to the console.
     - **DownloadFromObjectStorage** : Used to download all objects under a given key prefix from an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3 to a local directory. Preserves the relative directory structure, tracks total progress as file count and percentage, retries failed downloads with exponential backoff, and logs failures to the console.
     - **ListObjectStorage** : Used to list all objects under a given key prefix in an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3, without changing anything. Prints one key and its size per line, sorted by key, so that the output can be compared and read by other tools.
-    - **DeleteFromObjectStorage** : Used to delete all objects under a given key prefix from an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3. Optionally, deletes only the exact keys listed in a file, and nothing at all unless every one of them exists. Tracks total progress as object count and percentage, retries failed deletions with exponential backoff, and logs failures to the console.
+    - **DeleteFromObjectStorage** : Used to delete all objects under a given key prefix from an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3. Optionally, deletes only the exact keys given, and nothing at all unless every one of them exists. Tracks total progress as object count and percentage, retries failed deletions with exponential backoff, and logs failures to the console.
     - **CreateManifest** : Used to generate or update a distribution's `manifest.json`, listing every file with its size, its SHA-256 hash, and whether it is a program that needs the execute permission. Preserves hand-edited exclusion lists, and the executable version, from an existing manifest.
 
 <br/>
@@ -114,10 +114,10 @@ The first six arguments are required. Optional 7th argument: maximum retry attem
 
 The first five arguments are required. Optional 6th argument: maximum retry attempts per deletion batch (default: `5`).
 
-To delete only some objects, list their keys in a file, one per line, and add `--exact-keys` with the file's path. The tool lists the objects under the prefix first, and deletes nothing at all unless every key in the file exists exactly as written, so a key is never treated as a prefix:
+To delete only some objects, add `--exact-key` once for each key. The tool lists the objects under the prefix first, and deletes nothing at all unless every key given exists exactly as written, so a key is never treated as a prefix:
 
 ```
-./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "mac/" --exact-keys "keys.txt"
+./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "mac/" --exact-key "mac/game/resources0.s2z" --exact-key "mac/game/textures.s2z"
 ```
 
 **Distribution.ListObjectStorage**

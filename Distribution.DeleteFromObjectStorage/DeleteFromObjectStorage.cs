@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -53,19 +56,20 @@ internal class DeleteFromObjectStorage
             return 0;
         }
 
-        if (TrySplitExactKeys(arguments, out string[] positionalArguments, out List<string> requestedKeys) is false || positionalArguments.Length < 5)
+        if (TryReadArguments(arguments, out DeletionArguments? deletion) is false)
         {
             Console.WriteLine(Usage);
 
             return 1;
         }
 
-        string bucket = positionalArguments[0];
-        string serviceUrl = positionalArguments[1];
-        string accessKey = positionalArguments[2];
-        string secretKey = positionalArguments[3];
-        string keyPrefix = positionalArguments[4];
-        int maximumRetries = positionalArguments.Length >= 6 ? int.Parse(positionalArguments[5]) : DefaultMaximumRetries;
+        string bucket = deletion.Bucket;
+        string serviceUrl = deletion.ServiceURL;
+        string accessKey = deletion.AccessKey;
+        string secretKey = deletion.SecretKey;
+        string keyPrefix = deletion.KeyPrefix;
+        int maximumRetries = deletion.MaximumRetries;
+        IReadOnlyList<string> requestedKeys = deletion.ExactKeys;
 
         BasicAWSCredentials credentials = new(accessKey, secretKey);
 
@@ -147,37 +151,46 @@ internal class DeleteFromObjectStorage
     }
 
     /// <summary>
-    ///     Takes every "--exact-key" option and its key out of the arguments, keeping the remaining arguments in their order.
-    ///     Returns FALSE when an option has no key after it, or an empty one.
+    ///     Reads the command line: five arguments, an optional retry count, and any number of "--exact-key" options, each followed by its key.
+    ///     Returns FALSE for anything else, such as a misspelt option, a key given without its option, or a retry count that is not a positive number, because the tool would otherwise fall back to deleting everything under the prefix.
     /// </summary>
-    internal static bool TrySplitExactKeys(string[] arguments, out string[] positionalArguments, out List<string> exactKeys)
+    internal static bool TryReadArguments(string[] arguments, [NotNullWhen(true)] out DeletionArguments? deletion)
     {
         List<string> positional = [];
+        List<string> exactKeys = [];
 
-        exactKeys = [];
+        deletion = null;
 
         for (int index = 0; index < arguments.Length; index++)
         {
-            if (arguments[index] is not ExactKeyOption)
-            {
-                positional.Add(arguments[index]);
+            string argument = arguments[index];
 
-                continue;
+            if (argument is ExactKeyOption)
+            {
+                if (index + 1 >= arguments.Length || arguments[index + 1].Length is 0)
+                    return false;
+
+                index++;
+
+                exactKeys.Add(arguments[index]);
             }
 
-            if (index + 1 >= arguments.Length || arguments[index + 1].Length is 0)
-            {
-                positionalArguments = [];
-
+            else if (argument.StartsWith("--", StringComparison.Ordinal))
                 return false;
-            }
 
-            index++;
-
-            exactKeys.Add(arguments[index]);
+            else
+                positional.Add(argument);
         }
 
-        positionalArguments = [.. positional];
+        if (positional.Count is < 5 or > 6)
+            return false;
+
+        int maximumRetries = DefaultMaximumRetries;
+
+        if (positional.Count is 6 && (int.TryParse(positional[5], NumberStyles.None, CultureInfo.InvariantCulture, out maximumRetries) is false || maximumRetries < 1))
+            return false;
+
+        deletion = new DeletionArguments(positional[0], positional[1], positional[2], positional[3], positional[4], maximumRetries, exactKeys);
 
         return true;
     }

@@ -37,4 +37,13 @@ public sealed class KeySelectionTests
         await Assert.That(keys).IsEquivalentTo(["mac/manifest.json", "mac/game/resources0.s2z"]);
         await Assert.That(missing).IsEmpty();
     }
+
+    [Test]
+    public async Task A_Key_Requested_Twice_Is_Selected_Once()
+    {
+        (IReadOnlyList<string> keys, IReadOnlyList<string> missing) = KeySelection.SelectExactKeys(ListedKeys, ["mac/manifest.json", "mac/manifest.json"]);
+
+        await Assert.That(string.Join('|', keys)).IsEqualTo("mac/manifest.json");
+        await Assert.That(missing).IsEmpty();
+    }
 }

@@ -117,6 +117,31 @@ public sealed class CreateManifestTests
     }
 
     [Test]
+    [Arguments("not a manifest")]
+    [Arguments("""{"versionExecutable": 5, "excludeFromSource": [], "excludeFromTarget": [], "files": {}}""")]
+    public async Task An_Unreadable_Existing_Manifest_Fails_Without_Writing(string existingManifest)
+    {
+        string directory = CreateTemporaryDirectory();
+
+        try
+        {
+            File.WriteAllText(Path.Combine(directory, "hon.exe"), "text");
+            File.WriteAllText(Path.Combine(directory, "manifest.json"), existingManifest);
+
+            StringWriter error = new ();
+
+            await Assert.That(await CreateManifest.Run(directory, "5.26.12.24", RunTime, error)).IsEqualTo(1);
+            await Assert.That(File.ReadAllText(Path.Combine(directory, "manifest.json"))).IsEqualTo(existingManifest);
+            await Assert.That(error.ToString()).Contains("manifest.json");
+        }
+
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task An_Invalid_Executable_Version_Fails_Without_Writing()
     {
         string directory = CreateTemporaryDirectory();

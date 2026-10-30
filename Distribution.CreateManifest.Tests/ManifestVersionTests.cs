@@ -27,6 +27,7 @@ public sealed class ManifestVersionTests
     [Arguments("4.10.1.0")]
     [Arguments("5.26.10.31.0")]
     [Arguments(" 5.26.10.31")]
+    [Arguments("5.26.10.31\n")]
     [Arguments("")]
     [Arguments("5.٢٦.10.31")]
     public async Task An_Invalid_Version_Is_Rejected(string version)

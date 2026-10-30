@@ -111,7 +111,18 @@ internal class CreateManifest
         {
             Console.WriteLine("Loading Existing Manifest Metadata");
 
-            (existingVersionExecutable, excludeFromSource, excludeFromTarget) = await LoadExistingMetadataAsync(manifestPath);
+            try
+            {
+                (existingVersionExecutable, excludeFromSource, excludeFromTarget) = await LoadExistingMetadataAsync(manifestPath);
+            }
+
+            // A Manifest That Is Not JSON, Or Whose Fields Have The Wrong Type, Is Reported Rather Than Overwritten, Since Its Exclusion Lists May Hold Hand-Edited Patterns
+            catch (Exception exception) when (exception is JsonException or InvalidOperationException)
+            {
+                await error.WriteLineAsync($@"The Existing Manifest ""{manifestPath}"" Cannot Be Read: {exception.Message}");
+
+                return 1;
+            }
 
             if (excludeFromSource.Contains(ManifestFileName, StringComparer.OrdinalIgnoreCase) is false)
                 excludeFromSource.Insert(0, ManifestFileName);

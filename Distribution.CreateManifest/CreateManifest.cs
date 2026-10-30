@@ -28,10 +28,12 @@ internal class CreateManifest
     private const string VersionExecutableOption = "--version-executable";
     private const string Usage = "USAGE: Distribution.CreateManifest <directory> [--version-executable 5.YY.MM.DD]";
 
+    // The Manifest Is Written With LF Line Endings On Every Platform, As Every Text File In The Distributions Is, Rather Than With The Platform's Own
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
         IndentSize = 4,
+        NewLine = "\n",
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };

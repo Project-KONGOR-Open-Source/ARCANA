@@ -7,12 +7,14 @@ namespace Distribution.DeleteFromObjectStorage;
 /// <summary>
 ///     Deletes all objects under a given key prefix (folder) from an S3-compatible object storage bucket such as Cloudflare R2 or AWS S3.
 ///     Lists objects in batches, deletes them, tracks total progress as object count and percentage, retries failed deletions with exponential backoff, and logs failures to the console.
+///     With "--exact-keys", deletes only the keys listed in a file, and only when every one of them exists under the prefix exactly as written; otherwise, it deletes nothing.
 /// </summary>
 /// <remarks>
 ///     Example Usage:
 ///
 ///     <code>
 ///         ./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/4.10.1"
+///         ./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "mac/" --exact-keys "keys.txt"
 ///     </code>
 ///
 ///     Optional 6th argument: maximum retry attempts per deletion batch (default: 5).
@@ -21,6 +23,8 @@ internal class DeleteFromObjectStorage
 {
     private const int DefaultMaximumRetries = 5;
     private const int ListBatchSize = 1000;
+    private const string ExactKeysOption = "--exact-keys";
+    private const string Usage = "USAGE: Distribution.DeleteFromObjectStorage <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries] [--exact-keys <file>]";
     private static readonly TimeSpan InitialRetryDelay = TimeSpan.FromSeconds(1);
 
     internal static async Task<int> Main(string[] arguments)
@@ -29,10 +33,10 @@ internal class DeleteFromObjectStorage
         {
             Console.WriteLine();
             Console.WriteLine("Description:");
-            Console.WriteLine("  Deletes all objects under a given key prefix from an S3-compatible bucket.");
+            Console.WriteLine("  Deletes all objects under a given key prefix from an S3-compatible bucket, or only the exact keys listed in a file.");
             Console.WriteLine();
             Console.WriteLine("Usage:");
-            Console.WriteLine("  Distribution.DeleteFromObjectStorage <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries]");
+            Console.WriteLine("  Distribution.DeleteFromObjectStorage <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries] [--exact-keys <file>]");
             Console.WriteLine();
             Console.WriteLine("Arguments:");
             Console.WriteLine("  <bucket>       S3 bucket name");
@@ -42,13 +46,32 @@ internal class DeleteFromObjectStorage
             Console.WriteLine("  <keyPrefix>    key prefix (folder) to delete from (e.g. wac/4.10.1)");
             Console.WriteLine("  [maxRetries]   maximum retry attempts per deletion (default: 5)");
             Console.WriteLine();
+            Console.WriteLine("Options:");
+            Console.WriteLine("  --exact-keys <file>   deletes only the keys in the file, one per line, and nothing at all unless every one of them exists under the prefix exactly as written");
+            Console.WriteLine();
 
             return 0;
         }
 
+        string? exactKeysFile = null;
+        int exactKeysIndex = Array.IndexOf(arguments, ExactKeysOption);
+
+        if (exactKeysIndex >= 0)
+        {
+            if (exactKeysIndex + 1 >= arguments.Length)
+            {
+                Console.WriteLine(Usage);
+
+                return 1;
+            }
+
+            exactKeysFile = arguments[exactKeysIndex + 1];
+            arguments = [.. arguments[..exactKeysIndex], .. arguments[(exactKeysIndex + 2)..]];
+        }
+
         if (arguments.Length < 5)
         {
-            Console.WriteLine("USAGE: Distribution.DeleteFromObjectStorage <bucket> <serviceUrl> <accessKey> <secretKey> <keyPrefix> [maxRetries]");
+            Console.WriteLine(Usage);
 
             return 1;
         }
@@ -59,6 +82,16 @@ internal class DeleteFromObjectStorage
         string secretKey = arguments[3];
         string keyPrefix = arguments[4];
         int maximumRetries = arguments.Length >= 6 ? int.Parse(arguments[5]) : DefaultMaximumRetries;
+
+        // The Requested Keys Are Read Before Anything Is Listed, So That A Missing Or Empty File Stops The Tool Before It Reaches The Bucket
+        List<string>? requestedKeys = exactKeysFile is null ? null : [.. File.ReadAllLines(exactKeysFile).Where(line => line.Length > 0)];
+
+        if (requestedKeys is { Count: 0 })
+        {
+            Console.WriteLine($@"No Keys Requested In ""{exactKeysFile}""");
+
+            return 1;
+        }
 
         BasicAWSCredentials credentials = new(accessKey, secretKey);
 
@@ -91,6 +124,23 @@ internal class DeleteFromObjectStorage
         }
 
         while (continuationToken is not null);
+
+        if (requestedKeys is not null)
+        {
+            (IReadOnlyList<string> selectedKeys, IReadOnlyList<string> missingKeys) = KeySelection.SelectExactKeys(keys, requestedKeys);
+
+            if (missingKeys.Count > 0)
+            {
+                foreach (string key in missingKeys)
+                    Console.WriteLine($@"Not Found: ""{key}""");
+
+                Console.WriteLine($@"Nothing Deleted: {missingKeys.Count} Of {requestedKeys.Count} Requested Keys Do Not Exist Under Prefix ""{keyPrefix}""");
+
+                return 1;
+            }
+
+            keys = [.. selectedKeys];
+        }
 
         if (keys.Count is 0)
         {

@@ -61,6 +61,33 @@ public sealed class CreateManifestTests
     }
 
     [Test]
+    public async Task A_Manifest_Has_LF_Line_Endings_And_Ends_With_One_On_Every_Platform()
+    {
+        string directory = CreateTemporaryDirectory();
+
+        try
+        {
+            File.WriteAllText(Path.Combine(directory, "hon.exe"), "text");
+
+            await Assert.That(await CreateManifest.Run(directory, "5.26.12.24", RunTime, new StringWriter())).IsEqualTo(0);
+
+            byte[] manifest = File.ReadAllBytes(Path.Combine(directory, "manifest.json"));
+
+            using (Assert.Multiple())
+            {
+                await Assert.That(manifest.Contains((byte) '\r')).IsFalse();
+                await Assert.That(manifest[^1]).IsEqualTo((byte) '\n');
+                await Assert.That(manifest[^2]).IsNotEqualTo((byte) '\n');
+            }
+        }
+
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task Leaving_Out_The_Executable_Version_Keeps_The_Existing_One()
     {
         string directory = CreateTemporaryDirectory();

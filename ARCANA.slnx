@@ -5,7 +5,9 @@
     <Project Path="Distribution.CreateManifest/Distribution.CreateManifest.csproj" />
     <Project Path="Distribution.CreateManifest.Tests/Distribution.CreateManifest.Tests.csproj" />
     <Project Path="Distribution.DeleteFromObjectStorage/Distribution.DeleteFromObjectStorage.csproj" />
+    <Project Path="Distribution.DeleteFromObjectStorage.Tests/Distribution.DeleteFromObjectStorage.Tests.csproj" />
     <Project Path="Distribution.DownloadFromObjectStorage/Distribution.DownloadFromObjectStorage.csproj" />
+    <Project Path="Distribution.ListObjectStorage/Distribution.ListObjectStorage.csproj" />
     <Project Path="Distribution.PackResourceFiles/Distribution.PackResourceFiles.csproj" />
     <Project Path="Distribution.UnpackResourceFiles/Distribution.UnpackResourceFiles.csproj" />
     <Project Path="Distribution.UploadToObjectStorage/Distribution.UploadToObjectStorage.csproj" />

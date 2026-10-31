@@ -13,6 +13,8 @@ public sealed class ManifestVersionTests
 
     [Test]
     [Arguments("5.26.10.31")]
+    [Arguments("5.00.02.29")]
+    [Arguments("5.99.12.31")]
     [Arguments("5.28.02.29")]
     public async Task A_Whole_Version_5_With_A_Real_Date_Is_Valid(string version)
     {
@@ -23,6 +25,9 @@ public sealed class ManifestVersionTests
     [Arguments("5.26.02.30")]
     [Arguments("5.27.02.29")]
     [Arguments("5.26.13.01")]
+    [Arguments("5.26.00.10")]
+    [Arguments("5.26.10.00")]
+    [Arguments("5.26.10.32")]
     [Arguments("5.26.1.5")]
     [Arguments("4.10.1.0")]
     [Arguments("5.26.10.31.0")]

@@ -29,7 +29,7 @@ public sealed class ManifestVersionTests
     [Arguments("5.26.10.00")]
     [Arguments("5.26.10.32")]
     [Arguments("5.26.1.5")]
-    [Arguments("4.10.1.0")]
+    [Arguments("4.26.10.31")]
     [Arguments("5.26.10.31.0")]
     [Arguments(" 5.26.10.31")]
     [Arguments("5.26.10.31\n")]

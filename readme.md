@@ -25,7 +25,7 @@
 
 > [!NOTE]
 > Terminology
->    - archive : the collection of a distribution's incremental versions; this will be composed of multiple directories along the lines of `4.8.6`, `...`, `4.10.1`
+>    - archive : the collection of a distribution's incremental versions; this will be composed of multiple directories along the lines of `5.26.10.30`, `...`, `5.26.10.31`
 >    - distribution : the collection of files that make up a client or a server for a particular platform; a distribution's name is a 3-letter code, sometimes followed by a secret key to mask the files over the CDN; distribution name examples include `wac` and `las`
 >        - the first letter represents the distribution's platform, and is either `w` for Windows or `l` for Linux
 >        - the second letter represents the distribution's target, and is one of `a` for International, `g` for Garena, `r` for RCT, or `t` for SBT
@@ -96,12 +96,12 @@ If no directory is provided, the current working directory is used. Optional 2nd
 
 The first five arguments are required. Two optional arguments can follow:
 - 6th argument: maximum retry attempts per file (default: `5`)
-- 7th argument: key prefix to prepend to all uploaded object keys (e.g. `wac/4.10.1`, to organize files under a subdirectory in the bucket)
+- 7th argument: key prefix to prepend to all uploaded object keys (e.g. `wac/game`, to organize files under a subdirectory in the bucket)
 
 **Distribution.DownloadFromObjectStorage**
 
 ```
-./Distribution.DownloadFromObjectStorage.exe "path/to/directory" "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/4.10.1"
+./Distribution.DownloadFromObjectStorage.exe "path/to/directory" "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/game"
 ```
 
 The first six arguments are required. Optional 7th argument: maximum retry attempts per file (default: `5`).
@@ -109,7 +109,7 @@ The first six arguments are required. Optional 7th argument: maximum retry attem
 **Distribution.DeleteFromObjectStorage**
 
 ```
-./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/4.10.1"
+./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/game"
 ```
 
 The first five arguments are required. Optional 6th argument: maximum retry attempts per deletion batch (default: `5`).

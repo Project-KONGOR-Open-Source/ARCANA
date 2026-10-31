@@ -16,7 +16,7 @@ namespace Distribution.UploadToObjectStorage;
 ///     </code>
 ///
 ///     Optional 6th argument: maximum retry attempts per file (default: 5).
-///     Optional 7th argument: key prefix to prepend to all uploaded object keys (e.g. "wac/4.10.1", to organize files under a subdirectory in the bucket).
+///     Optional 7th argument: key prefix to prepend to all uploaded object keys (e.g. "wac/game", to organize files under a subdirectory in the bucket).
 /// </remarks>
 internal class UploadToObjectStorage
 {
@@ -41,7 +41,7 @@ internal class UploadToObjectStorage
             Console.WriteLine("  <accessKey>    access key ID");
             Console.WriteLine("  <secretKey>    secret access key");
             Console.WriteLine("  [maxRetries]   maximum retry attempts per file (default: 5)");
-            Console.WriteLine("  [keyPrefix]    prefix to prepend to all uploaded keys (e.g. wac/4.10.1)");
+            Console.WriteLine("  [keyPrefix]    prefix to prepend to all uploaded keys (e.g. wac/game)");
             Console.WriteLine();
 
             return 0;

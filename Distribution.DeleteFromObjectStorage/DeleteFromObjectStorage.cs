@@ -16,7 +16,7 @@ namespace Distribution.DeleteFromObjectStorage;
 ///     Example Usage:
 ///
 ///     <code>
-///         ./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/4.10.1"
+///         ./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/game"
 ///         ./Distribution.DeleteFromObjectStorage.exe "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "mac/" --exact-key "mac/game/resources0.s2z" --exact-key "mac/game/textures.s2z"
 ///     </code>
 ///
@@ -46,7 +46,7 @@ internal class DeleteFromObjectStorage
             Console.WriteLine("  <serviceUrl>   S3-compatible service URL (e.g. https://ACCOUNT_ID.r2.cloudflarestorage.com)");
             Console.WriteLine("  <accessKey>    access key ID");
             Console.WriteLine("  <secretKey>    secret access key");
-            Console.WriteLine("  <keyPrefix>    key prefix (folder) to delete from (e.g. wac/4.10.1)");
+            Console.WriteLine("  <keyPrefix>    key prefix (folder) to delete from (e.g. wac/game)");
             Console.WriteLine("  [maxRetries]   maximum retry attempts per deletion (default: 5)");
             Console.WriteLine();
             Console.WriteLine("Options:");

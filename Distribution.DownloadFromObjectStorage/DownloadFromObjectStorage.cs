@@ -12,7 +12,7 @@ namespace Distribution.DownloadFromObjectStorage;
 ///     Example Usage:
 ///
 ///     <code>
-///         ./Distribution.DownloadFromObjectStorage.exe "path/to/directory" "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/4.10.1"
+///         ./Distribution.DownloadFromObjectStorage.exe "path/to/directory" "bucket-name" "https://ACCOUNT_ID.r2.cloudflarestorage.com" "ACCESS_KEY_ID" "SECRET_ACCESS_KEY" "wac/game"
 ///     </code>
 ///
 ///     Optional 7th argument: maximum retry attempts per file (default: 5).
@@ -40,7 +40,7 @@ internal class DownloadFromObjectStorage
             Console.WriteLine("  <serviceUrl>   S3-compatible service URL (e.g. https://ACCOUNT_ID.r2.cloudflarestorage.com)");
             Console.WriteLine("  <accessKey>    access key ID");
             Console.WriteLine("  <secretKey>    secret access key");
-            Console.WriteLine("  <keyPrefix>    key prefix (folder) to download from (e.g. wac/4.10.1)");
+            Console.WriteLine("  <keyPrefix>    key prefix (folder) to download from (e.g. wac/game)");
             Console.WriteLine("  [maxRetries]   maximum retry attempts per file (default: 5)");
             Console.WriteLine();
 
